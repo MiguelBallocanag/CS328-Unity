@@ -1,14 +1,17 @@
-// RunState.cs
-using UnityEngine;
 public class RunState : GroundedState {
-    public override void Enter(PlayerController p){ pc = p; }
-    public override void Tick() {
-        float x = pc.moveInput.x;
-        float target = x * pc.runSpeed;
-        float vx = Mathf.MoveTowards(pc.rb.linearVelocity.x, target, pc.groundAccel * Time.deltaTime);
-        pc.rb.linearVelocity = new Vector2(vx, pc.rb.linearVelocity.y);
+    public override void Enter(PlayerController p) { base.Enter(p); }
 
-        if (Mathf.Abs(x) < 0.1f) pc.SwitchState(new IdleState());
+    public override void Tick() {
+        ApplyGroundMotion();
+
+        if (InputIdle) { pc.SwitchState(new IdleState()); return; }
+
+        if (pc.lastPressedJumpTime > 0f && pc.lastOnGroundTime > 0f) {
+            pc.SwitchState(new JumpState()); return;
+        }
+
+        if (!pc.IsGrounded) { pc.SwitchState(new FallState()); return; }
     }
+
     public override void Exit() { }
 }
