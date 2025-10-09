@@ -6,11 +6,16 @@ public class FallState : AirState
     {
         base.Enter(p);
         // If we just walked off a ledge, grant air jumps
-        if (p.lastOnGroundTime > 0f) p.airJumpsLeft = 1;
+        
     }
 
     public override void Tick()
     {
+        if (pc.dashPressed && pc.CanDashNow)
+        {
+            pc.SwitchState(new DashState());
+            return;
+        }
         ApplyAirMotion();
         ApplyHeavierFall();
 
@@ -28,5 +33,10 @@ public class FallState : AirState
             if (Mathf.Abs(pc.moveInput.x) < 0.1f) pc.SwitchState(new IdleState());
             else pc.SwitchState(new RunState());
         }
+        if (pc.attackPressed && pc.lightAttack != null) {
+        pc.SwitchState(new AttackLightState(pc.lightAttack));
+        return;
+}
+
     }
 }

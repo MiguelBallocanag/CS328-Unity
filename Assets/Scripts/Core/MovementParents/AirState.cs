@@ -19,7 +19,8 @@ public abstract class AirState : BaseState
 
         if (!jumpHeld && pc.rb.linearVelocity.y > 0f)
         {
-            pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * 2.4f * Time.deltaTime);
+            pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * pc.jumpData.earlyCutMult * Time.deltaTime);
+
         }
     }
 
@@ -27,8 +28,8 @@ public abstract class AirState : BaseState
     {
         if (pc.rb.linearVelocity.y < 0f)
         {
-            float mult = 1.25f; // mild heavier fall (will change if needed)
-            if (pc.moveInput.y < -0.5f) mult *= 1.9f; //fast fall when holding down
+            float mult = pc.jumpData.fallGravityMult;
+            if (pc.moveInput.y < -0.5f) mult *= pc.jumpData.fastFallMult;//fast fall when holding down
             pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * (mult - 1f) * Time.deltaTime);
         }
     }
