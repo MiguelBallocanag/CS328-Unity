@@ -9,6 +9,7 @@ public sealed class Anim
     private readonly Animator a;
 
     // Precompute Animator parameter hashes
+    static readonly int P_Attacking = Animator.StringToHash("Attacking");
     static readonly int P_Speed = Animator.StringToHash("Speed");
     static readonly int P_Grounded = Animator.StringToHash("Grounded");
     static readonly int P_YVel = Animator.StringToHash("YVel");

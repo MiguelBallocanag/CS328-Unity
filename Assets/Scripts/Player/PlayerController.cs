@@ -111,6 +111,16 @@ public class PlayerController : MonoBehaviour
     [Header("Combat")]
     public AttackData lightAttack;
     [HideInInspector] public bool attackPressed;
+    public float attackBuffer = 0.20f;   // 0.18–0.22 feels good in air
+    private float _attackBufferUntil;
+
+    public bool AttackBuffered => Time.time <= _attackBufferUntil;
+
+    public void ConsumeAttackBuffer() {
+        _attackBufferUntil = 0f;
+        attackPressed = false;
+    }
+
 
     void Awake()
     {
@@ -244,8 +254,12 @@ public class PlayerController : MonoBehaviour
     }
 
     public void OnAttack(UnityEngine.InputSystem.InputAction.CallbackContext ctx) {
-        if (ctx.started) attackPressed = true;
+        if (ctx.started) {
+            attackPressed = true;
+            _attackBufferUntil = Time.time + attackBuffer;  // extend buffer window
+        }
     }
+
 
 
     // --- helper: radial deadzone for analog stick

@@ -4,12 +4,20 @@ public class JumpState : AirState
     {
         base.Enter(p);
 
+ 
+
         p.Anim_Jump();
         DoJump();
     }
 
     public override void Tick()
     {
+        if ((pc.attackPressed || pc.AttackBuffered) && pc.lightAttack != null) {
+            pc.ConsumeAttackBuffer();
+            pc.SwitchState(new AttackLightState(pc.lightAttack));
+            return;
+        }
+        
         if (pc.dashPressed && pc.CanDashNow)
         {
             pc.SwitchState(new DashState());

@@ -11,12 +11,20 @@ public class FallState : AirState
 
     public override void Tick()
     {
+        if ((pc.attackPressed || pc.AttackBuffered) && pc.lightAttack != null) {
+            pc.ConsumeAttackBuffer();
+            pc.SwitchState(new AttackLightState(pc.lightAttack));
+            return;
+        }  
+        
         if (pc.dashPressed && pc.CanDashNow)
         {
             pc.SwitchState(new DashState());
             return;
         }
         ApplyAirMotion();
+
+        
         ApplyHeavierFall();
 
         // Air jump from fall (double jump)
@@ -33,10 +41,7 @@ public class FallState : AirState
             if (Mathf.Abs(pc.moveInput.x) < 0.1f) pc.SwitchState(new IdleState());
             else pc.SwitchState(new RunState());
         }
-        if (pc.attackPressed && pc.lightAttack != null) {
-        pc.SwitchState(new AttackLightState(pc.lightAttack));
-        return;
-}
+
 
     }
 }

@@ -65,6 +65,14 @@ public class AttackLightState : BaseState {
             return;
         }
 
+        if (timer >= startupT + activeT && timer < startupT + activeT + recoveryT) {
+            if ((pc.attackPressed || pc.AttackBuffered) && pc.lightAttack != null) {
+                pc.ConsumeAttackBuffer();
+                pc.SwitchState(new AttackLightState(pc.lightAttack));
+                return;
+            }
+        }
+
         if (timer >= startupT + activeT + recoveryT) {    // recovery done: leave state
             if (pc.IsGrounded) {
                 if (Mathf.Abs(pc.moveInput.x) < 0.1f) pc.SwitchState(new IdleState());

@@ -569,6 +569,7 @@ MonoBehaviour:
   airJumpsLeft: 0
   lightAttack: {fileID: 11400000, guid: f17f1cce3f7bf614a82de0e6129a44ac, type: 2}
   attackPressed: 0
+  attackBuffer: 0.12
 --- !u!1 &396295120
 GameObject:
   m_ObjectHideFlags: 0
