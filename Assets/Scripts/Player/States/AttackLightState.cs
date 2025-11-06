@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackLightState : BaseState {
+public class AttackLightState : AirState {
     // data for this swing (ScriptableObject)
     private readonly AttackData data;
 
@@ -22,7 +22,7 @@ public class AttackLightState : BaseState {
         base.Enter(p);
 
         // animation trigger
-        pc.Anim_Attack();
+        pc.TryStartAttackAnim();
 
         // cache timings
         startupT  = data.startup;
@@ -46,26 +46,28 @@ public class AttackLightState : BaseState {
         if (pc.IsGrounded) {
             if (!lockGroundX) ApplyGroundControlLight();
         } else {
-            ApplyAirControlLight(); // keep some drift like SSB aerials
+            ApplyAirControlLight();
+            ApplyBaseGravity();
+            ApplyEarlyCutIfNeeded();
+            ApplyHeavierFall();
         }
 
         // phases
-        if (timer < startupT) return;                      // startup: no hitbox
-        
-        // allow jump-cancel during active/recovery
+        if (timer < startupT) return; // startup: no hitbox
+
+        // allow jump-cancel during active/recovery (ground-only)
         if (pc.jumpPressed && pc.lastOnGroundTime > 0f) {
-        pc.SwitchState(new JumpState());
+            pc.SwitchState(new JumpState());
             return;
         }
 
-
-        if (timer < startupT + activeT)
-        {                 // active: can hit
+        if (timer < startupT + activeT) { // active: can hit
             DoHitbox();
             return;
         }
 
-        if (timer >= startupT + activeT && timer < startupT + activeT + recoveryT) {
+        // recovery: allow chaining
+        if (timer < startupT + activeT + recoveryT) {
             if ((pc.attackPressed || pc.AttackBuffered) && pc.lightAttack != null) {
                 pc.ConsumeAttackBuffer();
                 pc.SwitchState(new AttackLightState(pc.lightAttack));
@@ -73,7 +75,8 @@ public class AttackLightState : BaseState {
             }
         }
 
-        if (timer >= startupT + activeT + recoveryT) {    // recovery done: leave state
+        // recovery done: leave state
+        if (timer >= startupT + activeT + recoveryT) {
             if (pc.IsGrounded) {
                 if (Mathf.Abs(pc.moveInput.x) < 0.1f) pc.SwitchState(new IdleState());
                 else pc.SwitchState(new RunState());
@@ -93,7 +96,7 @@ public class AttackLightState : BaseState {
 
         Vector2 center = (Vector2)pc.transform.position + local;
 
-        // contact filter for target layers (Unity 6-friendly overload)
+        // contact filter for target layers
         var filter = new ContactFilter2D {
             useLayerMask = true,
             layerMask = data.targets

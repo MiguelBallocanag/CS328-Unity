@@ -4,6 +4,7 @@ public class RunState : GroundedState {
     public override void Tick()
     {
         if (pc.dashPressed && pc.CanDashNow) { pc.SwitchState(new DashState()); return; }
+
         ApplyGroundMotion();
 
         if (InputIdle) { pc.SwitchState(new IdleState()); return; }
