@@ -85,7 +85,7 @@ InitTestScene*.unity*
 /ServerData
 /[Aa]ssets/StreamingAssets/aa*
 /[Aa]ssets/AddressableAssetsData/link.xml*
-/[Aa]ssets/Addressables_Temp*
+/[Aa]ssets/Addressables_Temp*/
 
 /Assets/Unity.VisualScripting.Generated/
 Assets/Unity.VisualScripting.Generated.meta
@@ -109,6 +109,5 @@ Assets/Unity.VisualScripting.Generated.meta
 !/[Pp]rojectSettings/**
 !/[Pp]ackages/manifest.json
 !/[Pp]ackages/packages-lock.json
+!/[Aa]ssets/*.meta
 !/[Aa]ssets/**/*.meta
-
-FETCH_HEADAssets/_Recovery/
