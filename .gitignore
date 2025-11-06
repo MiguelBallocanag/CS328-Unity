@@ -111,4 +111,4 @@ Assets/Unity.VisualScripting.Generated.meta
 !/[Pp]ackages/packages-lock.json
 !/[Aa]ssets/**/*.meta
 
-FETCH_HEADAssets/_Recovery/
+/Assets/_Recovery/
