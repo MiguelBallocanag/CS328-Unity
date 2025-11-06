@@ -200,12 +200,14 @@ public class PlayerController : MonoBehaviour
                 _canDirJump = true;
         }
 
+        /*
         if (Mathf.Abs(rb.linearVelocity.x) > 0.01f)
         {
             var s = transform.localScale;
             s.x = Mathf.Sign(rb.linearVelocity.x) * Mathf.Abs(s.x);
             transform.localScale = s;
         }
+        */
 
         // Drive animator params each frame
         if (animFx != null)

@@ -335,6 +335,14 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 2ec45e8c-3f8b-45da-8127-91131cb79d4e
     m_ActionName: Player/Jump
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: c2f7ebad-35e1-41bf-9f18-0313bde6e904
+    m_ActionName: 'Player/Dash[/Keyboard/leftShift]'
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 4270538d-eb30-4087-88e4-87b1383337e7
+    m_ActionName: 'Player/Attack[/Mouse/leftButton]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
   m_DefaultActionMap: Player
@@ -504,15 +512,19 @@ MonoBehaviour:
   runSpeed: 8
   groundAccel: 40
   groundDecel: 60
-  jumpHeight: 4
-  timeToApex: 0.28
-  coyoteTime: 0.1
-  jumpBuffer: 0.1
+  jumpData: {fileID: 11400000, guid: 372a26cb6d8af7e49965978686bfa36a, type: 2}
   allowUpToJump: 1
   upThreshold: 0.95
   diagMinX: 0.8
   dirJumpHorizBoost: 1.5
   requireDiagonalForUpJump: 1
+  dashData: {fileID: 11400000, guid: f00654a7bb1dd1040af4a8e94a5db278, type: 2}
+  dashPressed: 0
+  maxAirDashes: 2
+  airDashesUsed: 0
+  nextDashTime: 0
+  animator: {fileID: 219769988}
+  sr: {fileID: 219769985}
   upHoldMinTime: 0.06
   rearmMinTime: 0.04
   stickDeadzone: 0.25
@@ -530,6 +542,9 @@ MonoBehaviour:
   lastOnGroundTime: 0
   lastPressedJumpTime: 0
   airJumpsLeft: 0
+  lightAttack: {fileID: 11400000, guid: f17f1cce3f7bf614a82de0e6129a44ac, type: 2}
+  attackPressed: 0
+  attackBuffer: 0.2
 --- !u!95 &219769988
 Animator:
   serializedVersion: 7
@@ -540,7 +555,7 @@ Animator:
   m_GameObject: {fileID: 219769981}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c964a06793ae8f347b81e463ba616629, type: 2}
+  m_Controller: {fileID: 9100000, guid: 794ab49b62a49104997b0e81d5b0956b, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -640,7 +655,7 @@ Transform:
   m_GameObject: {fileID: 396295120}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.8059807, y: -2.918, z: -10}
+  m_LocalPosition: {x: 2.949667, y: -2.918, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -891,7 +906,7 @@ Transform:
   m_GameObject: {fileID: 2117185794}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.8059807, y: -2.918, z: -10}
+  m_LocalPosition: {x: 2.949667, y: -2.918, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
