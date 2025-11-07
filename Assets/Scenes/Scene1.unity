@@ -547,8 +547,14 @@ MonoBehaviour:
   lastOnGroundTime: 0
   lastPressedJumpTime: 0
   airJumpsLeft: 0
+<<<<<<< HEAD
   lightAttack: {fileID: 0}
   attackPressed: 0
+=======
+  lightAttack: {fileID: 11400000, guid: f17f1cce3f7bf614a82de0e6129a44ac, type: 2}
+  attackPressed: 0
+  attackBuffer: 0.2
+>>>>>>> aa7a7ce6d3fca5287c5322abf6c482bb820bc6ec
 --- !u!95 &219769988
 Animator:
   serializedVersion: 7
@@ -559,7 +565,7 @@ Animator:
   m_GameObject: {fileID: 219769981}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: c964a06793ae8f347b81e463ba616629, type: 2}
+  m_Controller: {fileID: 9100000, guid: 794ab49b62a49104997b0e81d5b0956b, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
@@ -659,7 +665,11 @@ Transform:
   m_GameObject: {fileID: 396295120}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+<<<<<<< HEAD
   m_LocalPosition: {x: 2.9801805, y: -2.918, z: -10}
+=======
+  m_LocalPosition: {x: 2.949667, y: -2.918, z: -10}
+>>>>>>> aa7a7ce6d3fca5287c5322abf6c482bb820bc6ec
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -915,7 +925,11 @@ Transform:
   m_GameObject: {fileID: 2117185794}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+<<<<<<< HEAD
   m_LocalPosition: {x: 2.9801805, y: -2.918, z: -10}
+=======
+  m_LocalPosition: {x: 2.949667, y: -2.918, z: -10}
+>>>>>>> aa7a7ce6d3fca5287c5322abf6c482bb820bc6ec
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:

@@ -21,7 +21,7 @@ public class DashState : BaseState {
         {
             // air: use stick if any, else face/vel
             Vector2 inDir = pc.moveInput.sqrMagnitude > 0.01f ? pc.moveInput.normalized
-                                           
+
                            : new Vector2(Mathf.Sign(pc.rb.linearVelocity.x == 0 ? 1 : pc.rb.linearVelocity.x), 0f);
             // If you want air dash to be mostly horizontal, clamp Y a bit:
             // inDir.y = Mathf.Clamp(inDir.y, -0.6f, 0.6f);
@@ -41,14 +41,12 @@ public class DashState : BaseState {
         // start cooldown
         pc.jumpPressed = false; // optional: prevent accidental jump during dash frame
         pc.lastPressedJumpTime = 0f;
-        pc.nextDashTime = Time.time + pc.dashData.cooldown;
 
         pc.ConsumeAirDashIfNeeded();
         pc.StartDashCooldown();
-
-        // fire FX/SFX event if you use one:
-        // PlayerEvents.OnDash?.Invoke();
+        pc.RegisterDashForStreak();
         p.Anim_Dash();
+        pc.dashPressed = false;
     }
 
     public override void Tick() {
@@ -75,5 +73,12 @@ public class DashState : BaseState {
 
     public override void Exit() {
         pc.rb.gravityScale = _originalGrav;
+
+        var v = pc.rb.linearVelocity;
+                      
+        v.x *= 0.15f;                 
+  
+        pc.rb.linearVelocity = v;
+        pc.justDashed = true;
     }
 }

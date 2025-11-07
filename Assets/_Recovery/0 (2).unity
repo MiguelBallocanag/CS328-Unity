@@ -567,7 +567,7 @@ MonoBehaviour:
   lastOnGroundTime: 0
   lastPressedJumpTime: 0
   airJumpsLeft: 0
-  lightAttack: {fileID: 0}
+  lightAttack: {fileID: 11400000, guid: f17f1cce3f7bf614a82de0e6129a44ac, type: 2}
   attackPressed: 0
 --- !u!1 &396295120
 GameObject:
