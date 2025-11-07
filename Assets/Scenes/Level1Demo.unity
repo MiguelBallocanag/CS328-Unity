@@ -7082,8 +7082,8 @@ MonoBehaviour:
   rearmThreshold: 0.3
   enableAirJumps: 0
   clampVerticalSpeed: 1
-  maxRiseSpeed: 3
-  maxFallSpeed: 8
+  maxRiseSpeed: 1
+  maxFallSpeed: 7
   groundCheck: {fileID: 552699664}
   groundCheckRadius: 0.12
   groundMask:
@@ -7094,9 +7094,9 @@ MonoBehaviour:
   attackBuffer: 0.2
   dashData: {fileID: 11400000, guid: f00654a7bb1dd1040af4a8e94a5db278, type: 2}
   enablePlatformSnap: 1
-  snapProbe: 0.28
+  snapProbe: 0.3
   snapVYThreshold: -6
-  snapMaxSlope: 45
+  snapMaxSlope: 55
   enableApexHang: 1
   apexVyBand: -4
   apexHangMult: 0.55
@@ -7105,9 +7105,9 @@ MonoBehaviour:
   apexAccelBoost: 1.5
   apexMaxAirSpeedBoost: 1.1
   enableGraceLanding: 1
-  graceTime: 0.15
-  graceRadiusMult: 1.5
-  graceFrictionBrake: 300
+  graceTime: 0.16
+  graceRadiusMult: 1.6
+  graceFrictionBrake: 360
   justDashed: 0
   dashPressed: 0
   maxAirDashes: 2
