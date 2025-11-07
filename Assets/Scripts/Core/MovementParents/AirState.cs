@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public abstract class AirState : BaseState
 {
@@ -14,7 +13,16 @@ public abstract class AirState : BaseState
 
     protected void ApplyBaseGravity()
     {
-        pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * Time.deltaTime);
+        float g = pc.Gravity;
+
+        // Apex hangtime: reduce gravity near apex for precision
+        if (pc.enableApexHang && pc.rb.linearVelocity.y > 0f &&
+            Mathf.Abs(pc.rb.linearVelocity.y) <= pc.apexVyBand)
+        {
+            g *= pc.apexHangMult; // < 1 slows rise near apex
+        }
+
+        pc.rb.linearVelocity += Vector2.up * (-g * Time.fixedDeltaTime);
     }
 
     protected void ApplyEarlyCutIfNeeded()
@@ -24,11 +32,10 @@ public abstract class AirState : BaseState
             if (!pc.jumpHeld)
             {
                 // short hop gravity (Celeste / SMB jump cutoff)
-                pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * pc.jumpData.earlyCutMult * Time.deltaTime);
+                pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * pc.jumpData.earlyCutMult * Time.fixedDeltaTime);
             }
         }
     }
-
 
     protected void ApplyHeavierFall()
     {
@@ -36,7 +43,7 @@ public abstract class AirState : BaseState
         {
             float mult = pc.jumpData.fallGravityMult;
             if (pc.moveInput.y < -0.5f) mult *= pc.jumpData.fastFallMult;
-            pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * (mult - 1f) * Time.deltaTime);
+            pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * (mult - 1f) * Time.fixedDeltaTime);
         }
     }
 
@@ -44,7 +51,10 @@ public abstract class AirState : BaseState
     {
         float x = pc.moveInput.x;
         float vx = pc.rb.linearVelocity.x;
-        float target = x * Mathf.Max(pc.runSpeed, pc.maxAirSpeed);
+
+        // base caps & accel
+        float cap = Mathf.Max(pc.runSpeed, pc.maxAirSpeed);
+        float target = x * cap;
 
         float accel;
         if (Mathf.Abs(x) > 0.01f)
@@ -58,8 +68,16 @@ public abstract class AirState : BaseState
             target = 0f;
         }
 
-        float newVx = Mathf.MoveTowards(vx, target, accel * Time.deltaTime);
-        newVx = Mathf.Clamp(newVx, -pc.maxAirSpeed, pc.maxAirSpeed);
+        // Apex steer: boost control and a slight cap bump near apex
+        if (pc.enableApexSteer && Mathf.Abs(pc.rb.linearVelocity.y) <= pc.apexSteerVyBand)
+        {
+            accel *= pc.apexAccelBoost;
+            cap *= pc.apexMaxAirSpeedBoost;
+            target = x * cap;
+        }
+
+        float newVx = Mathf.MoveTowards(vx, target, accel * Time.fixedDeltaTime);
+        newVx = Mathf.Clamp(newVx, -cap, cap);
 
         pc.rb.linearVelocity = new Vector2(newVx, pc.rb.linearVelocity.y);
     }

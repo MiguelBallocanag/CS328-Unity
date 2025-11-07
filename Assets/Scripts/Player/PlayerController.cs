@@ -67,7 +67,49 @@ public class PlayerController : MonoBehaviour
     float _dashStreakUntil;
     int _dashStreakCount;
 
-    int _lastAttackAnimFrame = -1; // <--- keep
+    int _lastAttackAnimFrame = -1; // keep
+
+    // =========================
+    // Assists
+    // =========================
+    [Header("Assists — Platform Snap")]
+    public bool enablePlatformSnap = true;
+    [Tooltip("Probe distance below groundCheck to snap onto platforms")]
+    public float snapProbe = 0.18f;
+    [Tooltip("Only snap if vertical speed is not faster than this downward")]
+    public float snapVYThreshold = -8f;
+    [Tooltip("Max slope (deg) allowed to snap to")]
+    public float snapMaxSlope = 40f;
+
+    [Header("Assists — Apex Hang")]
+    public bool enableApexHang = true;
+    [Tooltip("If |vy| is inside this band near apex, reduce gravity")]
+    public float apexVyBand = 0.8f;
+    [Tooltip("Gravity multiplier near apex (0.5 = half gravity)")]
+    [Range(0.2f, 1.0f)] public float apexHangMult = 0.55f;
+
+    [Header("Assists — Apex Steer")]
+    public bool enableApexSteer = true;
+    [Tooltip("If |vy| <= this near apex, increase air accel & cap")]
+    public float apexSteerVyBand = 1.2f;
+    [Tooltip("Multiply air accel when within apex band")]
+    public float apexAccelBoost = 1.5f;
+    [Tooltip("Multiply max air speed when within apex band")]
+    public float apexMaxAirSpeedBoost = 1.10f;
+
+    [Header("Assists — Grace Landing")]
+    public bool enableGraceLanding = true;
+    [Tooltip("Time after landing to be forgiving (bigger ground circle / extra brake)")]
+    public float graceTime = 0.08f;
+    [Tooltip("Ground check radius multiplier during grace")]
+    public float graceRadiusMult = 1.35f;
+    [Tooltip("Extra braking force while not pressing X during grace")]
+    public float graceFrictionBrake = 200f;
+
+    // Landing grace timer
+    float _landingGraceUntil;
+    public bool InLandingGrace => enableGraceLanding && (Time.time < _landingGraceUntil);
+    public void StartLandingGrace() { if (enableGraceLanding) _landingGraceUntil = Time.time + graceTime; }
 
     public void RegisterDashForStreak() {
         float now = Time.time;
@@ -153,11 +195,7 @@ public class PlayerController : MonoBehaviour
         jumpData.Compute();
         Gravity = jumpData.gravity;
         JumpVelocity = jumpData.jumpVelocity;
-
-        // Removed the ratchet that permanently shrinks maxRiseSpeed.
-        // If you later add an upward clamp, set maxRiseSpeed explicitly there.
-        // if (clampVerticalSpeed)
-        //     maxRiseSpeed = Mathf.Min(maxRiseSpeed, JumpVelocity);
+        // Removed old ratchet; rise clamping is handled in JumpState.
     }
 
     void Awake()
@@ -183,16 +221,20 @@ public class PlayerController : MonoBehaviour
     {
         ApplyJumpTuning();
 
-        IsGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundMask);
+        // Grace landing: inflate ground check radius briefly after landing
+        float radius = groundCheckRadius * (InLandingGrace ? graceRadiusMult : 1f);
+        IsGrounded = Physics2D.OverlapCircle(groundCheck.position, radius, groundMask);
         if (IsGrounded) lastOnGroundTime = jumpData.coyoteTime;
         else lastOnGroundTime -= Time.deltaTime;
 
         lastPressedJumpTime -= Time.deltaTime;
 
+        // landing transition -> start grace
         if (!_wasGrounded && IsGrounded)
         {
             airJumpsLeft = enableAirJumps ? jumpData.maxAirJumps : 0;
             ResetAirDashes();
+            StartLandingGrace();
         }
         _wasGrounded = IsGrounded;
 
@@ -216,7 +258,6 @@ public class PlayerController : MonoBehaviour
 
             bool kbUp = Keyboard.current?.wKey.wasPressedThisFrame ?? false;
             bool kbDiagRight = kbUp && (Keyboard.current?.dKey.isPressed ?? false);
-            // FIX: left matches right (isPressed, not wasPressedThisFrame)
             bool kbDiagLeft  = kbUp && (Keyboard.current?.aKey.isPressed ?? false);
 
             bool dirJumpPressed = kbUp || kbDiagRight || kbDiagLeft || (_upHeldTime >= upHoldMinTime);
@@ -267,7 +308,6 @@ public class PlayerController : MonoBehaviour
     // -------- Physics & state machine run at fixed timestep --------
     void FixedUpdate()
     {
-        // Run state logic here so Time.deltaTime == Time.fixedDeltaTime in gravity/vel code
         _current?.Tick();
 
         if (clampVerticalSpeed)
