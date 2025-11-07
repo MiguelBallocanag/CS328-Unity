@@ -19,14 +19,16 @@ public abstract class AirState : BaseState
 
     protected void ApplyEarlyCutIfNeeded()
     {
-        bool jumpHeld = (Keyboard.current?.spaceKey.isPressed ?? false)
-                        || (Gamepad.current?.aButton.isPressed ?? false);
-
-        if (!jumpHeld && pc.rb.linearVelocity.y > 0f)
+        if (pc.rb.linearVelocity.y > 0f)
         {
-            pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * pc.jumpData.earlyCutMult * Time.deltaTime);
+            if (!pc.jumpHeld)
+            {
+                // short hop gravity (Celeste / SMB jump cutoff)
+                pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * pc.jumpData.earlyCutMult * Time.deltaTime);
+            }
         }
     }
+
 
     protected void ApplyHeavierFall()
     {

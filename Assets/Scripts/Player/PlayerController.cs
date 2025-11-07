@@ -1,3 +1,4 @@
+// PlayerController.cs
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -9,19 +10,20 @@ public class PlayerController : MonoBehaviour
     public Vector2 moveInput;
 
     [Header("Run")]
-    public float runSpeed = 8f, groundAccel = 40f, groundDecel = 60f;
+    public float runSpeed = 5.8f, groundAccel = 70f, groundDecel = 100f;
 
     [Header("Air Run")]
-    public float airAccel = 25f;
-    public float airDecel = 12f;
-    public float airTurnAccel = 38f;
-    public float maxAirSpeed = 10f;
+    public float airAccel = 20f;
+    public float airDecel = 14f;
+    public float airTurnAccel = 32f;
+    public float maxAirSpeed = 6.8f;
 
     [Header("Ground Stop Tuning")]
     public float stopThreshold = 0.05f;
     public float idleBrake = 120f;
 
     [Header("Jump (Data)")]
+    [HideInInspector] public bool jumpHeld;
     public JumpData jumpData;
     public float Gravity { get; private set; }
     public float JumpVelocity { get; private set; }
@@ -48,7 +50,7 @@ public class PlayerController : MonoBehaviour
     [Header("Vertical Speed Clamp")]
     public bool clampVerticalSpeed = true;
     public float maxRiseSpeed = 8f;
-    public float maxFallSpeed = 16f;
+    public float maxFallSpeed = 14f;
 
     [Header("Ground Check")]
     public Transform groundCheck;
@@ -65,7 +67,7 @@ public class PlayerController : MonoBehaviour
     float _dashStreakUntil;
     int _dashStreakCount;
 
-    int _lastAttackAnimFrame = -1; // <--- NEW
+    int _lastAttackAnimFrame = -1; // <--- keep
 
     public void RegisterDashForStreak() {
         float now = Time.time;
@@ -145,16 +147,26 @@ public class PlayerController : MonoBehaviour
         attackPressed = false;
     }
 
+    void ApplyJumpTuning()
+    {
+        if (!jumpData) return;
+        jumpData.Compute();
+        Gravity = jumpData.gravity;
+        JumpVelocity = jumpData.jumpVelocity;
+
+        // Removed the ratchet that permanently shrinks maxRiseSpeed.
+        // If you later add an upward clamp, set maxRiseSpeed explicitly there.
+        // if (clampVerticalSpeed)
+        //     maxRiseSpeed = Mathf.Min(maxRiseSpeed, JumpVelocity);
+    }
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         rb.gravityScale = 0f;
 
-        rb = GetComponent<Rigidbody2D>();
         if (sr == null) sr = GetComponentInChildren<SpriteRenderer>(true);
-        jumpData.Compute();
-        Gravity = jumpData.gravity;
-        JumpVelocity = jumpData.jumpVelocity;
+        ApplyJumpTuning();
 
         if (animator == null) animator = GetComponentInChildren<Animator>(true);
         if (sr == null) sr = GetComponentInChildren<SpriteRenderer>(true);
@@ -166,8 +178,11 @@ public class PlayerController : MonoBehaviour
         SwitchState(new IdleState());
     }
 
+    // -------- Input & non-physics runs per-rendered-frame --------
     void Update()
     {
+        ApplyJumpTuning();
+
         IsGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundMask);
         if (IsGrounded) lastOnGroundTime = jumpData.coyoteTime;
         else lastOnGroundTime -= Time.deltaTime;
@@ -201,7 +216,8 @@ public class PlayerController : MonoBehaviour
 
             bool kbUp = Keyboard.current?.wKey.wasPressedThisFrame ?? false;
             bool kbDiagRight = kbUp && (Keyboard.current?.dKey.isPressed ?? false);
-            bool kbDiagLeft = kbUp && (Keyboard.current?.aKey.isPressed ?? false);
+            // FIX: left matches right (isPressed, not wasPressedThisFrame)
+            bool kbDiagLeft  = kbUp && (Keyboard.current?.aKey.isPressed ?? false);
 
             bool dirJumpPressed = kbUp || kbDiagRight || kbDiagLeft || (_upHeldTime >= upHoldMinTime);
 
@@ -229,6 +245,29 @@ public class PlayerController : MonoBehaviour
             sr.flipX = moveInput.x < 0f;
         }
 
+        // Treat Space + W + stick-up (when allowed) + gamepad South as "held jump"
+        bool kbSpaceHeld = Keyboard.current?.spaceKey.isPressed ?? false;
+        bool kbWHeld     = Keyboard.current?.wKey.isPressed ?? false;
+
+        bool stickUpHeld = false;
+        if (allowUpToJump)
+        {
+            bool aboveUpBand = (filtered.y >= upThreshold) && (filtered.magnitude >= minUpMagnitude);
+            bool diagonalOK  = !requireDiagonalForUpJump || (Mathf.Abs(filtered.x) >= diagMinX);
+            stickUpHeld = aboveUpBand && diagonalOK;
+        }
+
+        jumpHeld =
+            kbSpaceHeld ||
+            kbWHeld     ||
+            stickUpHeld ||
+            (Gamepad.current?.buttonSouth.isPressed ?? false);
+    }
+
+    // -------- Physics & state machine run at fixed timestep --------
+    void FixedUpdate()
+    {
+        // Run state logic here so Time.deltaTime == Time.fixedDeltaTime in gravity/vel code
         _current?.Tick();
 
         if (clampVerticalSpeed)
@@ -238,11 +277,10 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = v;
         }
 
+        // Clear one-frame input flags AFTER physics consumed them
         jumpPressed = false;
         dashPressed = false;
         attackPressed = false;
-        _prevMoveInput = moveInput;
-        _prevFiltered = filtered;
     }
 
     public void OnMove(InputAction.CallbackContext c)
@@ -257,6 +295,7 @@ public class PlayerController : MonoBehaviour
             jumpPressed = true;
             lastPressedJumpTime = jumpData.jumpBuffer;
         }
+        // intentionally do NOT set jumpHeld here; we poll each frame in Update()
     }
 
     public void OnDash(InputAction.CallbackContext ctx)
