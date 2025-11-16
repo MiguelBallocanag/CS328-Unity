@@ -4,20 +4,22 @@ using System.Collections.Generic;
 
 public class EnemyAttack : MonoBehaviour
 {
+    // Attack parameters
     [Header("Attack Parameters")]
-    [SerializeField] private float attackcooldown;
-    [SerializeField] private int attackdamage;
+    [SerializeField] private float attackcooldown = 2f;
+    [SerializeField] private int attackdamage =10;
     [SerializeField] private float attackrange=1f;
+   
 
-    
+    // References
     private Animator anim;
     private Transform player;
     private float attackTime;
     [Header("Player Parameters")]
-    private float attacktimer = Mathf.Infinity;
-    public LayerMask playerlayer;
-    public LayerMask obstaclelayer;
-    //private Health playerHealth;
+    private float cooldownTimer = Mathf.Infinity;
+    [SerializeField] private LayerMask Player;
+    //public LayerMask obstaclelayer;
+    public PlayerHealth playerHealth;
 
     private EnemyPatrol enemyPatrol;    
 
@@ -37,49 +39,49 @@ public class EnemyAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        attackcooldown += Time.deltaTime;
-        if( PlayerInSight() )
+       
+        cooldownTimer += Time.deltaTime;
+        if (enemyPatrol !=null)
+   
+            enemyPatrol.enabled = !PlayerInSight();
+
+        if (PlayerInSight()) 
         {
-            if(attackcooldown>=attackTime)
+            if (cooldownTimer >= attackcooldown)
             {
-                
-                attackTime= 0;
+               
+                cooldownTimer = 0;
                 anim.SetTrigger("MeleeAttack");
             }
         }
-        if(enemyPatrol!=null)
-        {
-            enemyPatrol.enabled = !PlayerInSight();
-        }
-
-
     }
     // Check if the player is in sight using raycasting
-    bool PlayerInSight()
+    private bool PlayerInSight()
     {
-        RaycastHit2D hit = Physics2D.Raycast(transform.position, (player.position - transform.position).normalized, attackrange, playerlayer);
-        if (hit.collider != null && hit.collider.CompareTag("Player"))
-        {
-           
-            return true;// Player is in sight
-        }
-        return false;// Something is blocking the view
-    }   
-    void Attack()
-    {
-        // Play attack animation
-        anim.SetTrigger("MeleeAttack");
-        Collider2D hit=Physics2D.OverlapCircle(transform.position, attackrange, playerlayer);
         
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackrange, Player);
+        return hit != null;
+
     }
-    //private void DamagePlayer()
+    //void Attack()
     //{
-    //    if(PlayerInSight())
-    //    {// Deal damage to the player
-    //        player.GetComponent<playerHealth>().TakeDamage(attackdamage);
-    //    }   
+    //    // Play attack animation
+    //    anim.SetTrigger("MeleeAttack");
+    //    Collider2D hit=Physics2D.OverlapCircle(transform.position, attackrange, playerlayer);
+        
     //}
-    // Visualize the attack range in the editor
+    // Deal damage to the player if in range
+    public void DamagePlayer()
+    {
+        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackrange, Player);
+        if (hit !=null)
+        {// Deal damage to the player
+            PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+                player.GetComponent<PlayerHealth>().TakeDamage(attackdamage);
+        }
+    }
+    //Visualize the attack range in the editor
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

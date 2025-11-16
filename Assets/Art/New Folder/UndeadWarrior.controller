@@ -122,7 +122,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: b97fa00d1174e1c4c848baebc5550b7d, type: 2}
-  m_Tag: 
+  m_Tag: EnemyHurt
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -224,7 +224,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: c0d56599250b24f468f1d471bb7c4bae, type: 2}
-  m_Tag: 
+  m_Tag: MeleeAttack
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -296,7 +296,7 @@ AnimatorState:
   m_CycleOffsetParameterActive: 0
   m_TimeParameterActive: 0
   m_Motion: {fileID: 7400000, guid: 8bc1ad23f4e12264c8222f920c25d867, type: 2}
-  m_Tag: 
+  m_Tag: EnemyDie
   m_SpeedParameter: 
   m_MirrorParameter: 
   m_CycleOffsetParameter: 
@@ -374,7 +374,7 @@ AnimatorStateMachine:
     m_Position: {x: 110, y: -80, z: 0}
   - serializedVersion: 1
     m_State: {fileID: 1960144634842874247}
-    m_Position: {x: 550, y: -80, z: 0}
+    m_Position: {x: 560, y: -80, z: 0}
   - serializedVersion: 1
     m_State: {fileID: -2120289066756708103}
     m_Position: {x: 340, y: -20, z: 0}
