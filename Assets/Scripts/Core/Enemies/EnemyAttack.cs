@@ -8,8 +8,9 @@ public class EnemyAttack : MonoBehaviour
     [Header("Attack Parameters")]
     [SerializeField] private float attackcooldown = 2f;
     [SerializeField] private int attackdamage =10;
-    [SerializeField] private float attackrange=1f;
-   
+    [SerializeField] private float attackrange=0.5f;
+    [SerializeField] private Transform attackPoint;
+
 
     // References
     private Animator anim;
@@ -39,27 +40,29 @@ public class EnemyAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-       
         cooldownTimer += Time.deltaTime;
-        if (enemyPatrol !=null)
-   
-            enemyPatrol.enabled = !PlayerInSight();
 
-        if (PlayerInSight()) 
+        bool inSight = PlayerInSight();
+
+        // Stop patrol ONLY while attacking or preparing to attack
+        if (enemyPatrol != null)
+            enemyPatrol.enabled = !inSight;
+
+        if (inSight)
         {
             if (cooldownTimer >= attackcooldown)
             {
-               
                 cooldownTimer = 0;
                 anim.SetTrigger("MeleeAttack");
             }
         }
     }
+
     // Check if the player is in sight using raycasting
     private bool PlayerInSight()
     {
         
-        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackrange, Player);
+        Collider2D hit = Physics2D.OverlapCircle(attackPoint.position, attackrange, Player);
         return hit != null;
 
     }
@@ -73,7 +76,7 @@ public class EnemyAttack : MonoBehaviour
     // Deal damage to the player if in range
     public void DamagePlayer()
     {
-        Collider2D hit = Physics2D.OverlapCircle(transform.position, attackrange, Player);
+        Collider2D hit = Physics2D.OverlapCircle(attackPoint.position, attackrange, Player);
         if (hit !=null)
         {// Deal damage to the player
             PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>();
@@ -85,6 +88,6 @@ public class EnemyAttack : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, attackrange);
+        Gizmos.DrawWireSphere(attackPoint.position, attackrange);// Draw a wire sphere to represent the attack range
     }
 }
