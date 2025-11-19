@@ -2,7 +2,8 @@ using UnityEngine;
 
 public class SwampHazard : MonoBehaviour
 {
-    public float slowMultiplier = 0.4f;   // 40% normal speed
+    public float slowMultiplier = 0.4f;
+    public float jumpMultiplier = 0.6f;  // <--- NEW
 
     private void OnTriggerEnter2D(Collider2D other)
     {
@@ -10,7 +11,7 @@ public class SwampHazard : MonoBehaviour
         if (pc != null)
         {
             pc.swampSpeedMult = slowMultiplier;
-            Debug.Log("Entered swamp");
+            pc.swampJumpMult = jumpMultiplier;
         }
     }
 
@@ -20,8 +21,9 @@ public class SwampHazard : MonoBehaviour
         if (pc != null)
         {
             pc.swampSpeedMult = 1f;
-            pc.swampJumpLock = false;
-            Debug.Log("Exited swamp");
+            pc.swampJumpMult = 1f;
         }
     }
 }
+
+

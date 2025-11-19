@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
     [Header("Hazard Effects")]
     public float swampSpeedMult = 1f;
     public bool swampJumpLock = false;
+    public float swampJumpMult = 1f;
 
 
     // =========================
@@ -201,6 +202,8 @@ public class PlayerController : MonoBehaviour
         Gravity = jumpData.gravity;
         JumpVelocity = jumpData.jumpVelocity;
         // Removed old ratchet; rise clamping is handled in JumpState.
+        JumpVelocity = jumpData.jumpVelocity * swampJumpMult;
+
     }
 
     void Awake()
