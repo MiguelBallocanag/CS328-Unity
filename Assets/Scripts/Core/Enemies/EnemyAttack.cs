@@ -11,18 +11,30 @@ public class EnemyAttack : MonoBehaviour
     [SerializeField] private float attackrange=0.5f;
     [SerializeField] private Transform attackPoint;
 
+    [Header("Enemy Type Settings")]
+    [SerializeField] private bool canBlock = false;
+    [SerializeField] private bool isSentinel = false;
+    
+
 
     // References
     private Animator anim;
     private Transform player;
     private float attackTime;
+
     [Header("Player Parameters")]
     private float cooldownTimer = Mathf.Infinity;
     [SerializeField] private LayerMask Player;
     //public LayerMask obstaclelayer;
-    public PlayerHealth playerHealth;
+  
 
-    private EnemyPatrol enemyPatrol;    
+    private EnemyPatrol enemyPatrol;
+    private bool isDead = false;
+
+    // Animator parameters mapping
+    private string paramAttack;
+    private string paramMove;
+    private string paramBlock;
 
 
 
@@ -33,6 +45,20 @@ public class EnemyAttack : MonoBehaviour
         anim = GetComponent<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
 
+        if (isSentinel)
+        {
+            // Map Sentinel-specific animator parameters
+            paramAttack = "swordAttack";
+            paramMove = "IsWalking";
+            paramBlock = "IsBlocking";//sentinel block parameter only
+        }
+        else
+        { // Map standard enemy animator parameters
+            paramAttack = "MeleeAttack";
+            paramMove = "Moving";
+            paramBlock = "";//no block parameter for standard enemy
+        }
+
     }
 
 
@@ -40,6 +66,8 @@ public class EnemyAttack : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (isDead)
+            return;
         cooldownTimer += Time.deltaTime;
 
         bool inSight = PlayerInSight();
@@ -50,13 +78,16 @@ public class EnemyAttack : MonoBehaviour
 
         if (inSight)
         {
+            if (canBlock && !string.IsNullOrEmpty(paramBlock))
+                TryBlock();
+
             if (cooldownTimer >= attackcooldown)
             {
                 cooldownTimer = 0;
-                anim.SetTrigger("MeleeAttack");
+                anim.SetTrigger(paramAttack);
             }
         }
-    }
+    }    
 
     // Check if the player is in sight using raycasting
     private bool PlayerInSight()
@@ -79,11 +110,48 @@ public class EnemyAttack : MonoBehaviour
         Collider2D hit = Physics2D.OverlapCircle(attackPoint.position, attackrange, Player);
         if (hit !=null)
         {// Deal damage to the player
-            PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-                player.GetComponent<PlayerHealth>().TakeDamage(attackdamage);
+            PlayerHealth ph = hit.GetComponent<PlayerHealth>();
+            if (ph != null)
+                ph.TakeDamage(attackdamage);
         }
     }
+    // Stop blocking after a short duration
+    private void TryBlock()
+    {
+        if (string.IsNullOrEmpty(paramBlock))
+            return;
+
+       
+            anim.SetBool(paramBlock, true);
+            StartCoroutine(StopBlocking());
+        
+    }
+    public void OnEnemyDeath()
+    {
+        isDead = true;
+
+        // Stop any running block
+        if (!string.IsNullOrEmpty(paramBlock))
+            anim.SetBool(paramBlock, false);
+
+        // Reset triggers
+        anim.ResetTrigger(paramAttack);
+
+        // Stop AI
+        if (enemyPatrol != null)
+        {
+            enemyPatrol.enabled = false;
+        }
+        StopAllCoroutines();
+        this.enabled = false; // fully disable attacking
+    }
+
+    private IEnumerator StopBlocking()
+    {
+        yield return new WaitForSeconds(1f); // Block for 1 second
+        anim.SetBool(paramBlock, false);
+    }
+
     //Visualize the attack range in the editor
     void OnDrawGizmosSelected()
     {
