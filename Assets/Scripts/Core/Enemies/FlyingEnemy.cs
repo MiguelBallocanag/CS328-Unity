@@ -2,7 +2,7 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class FlyingEnemy : MonoBehaviour
+public class FlyingEnemy : MonoBehaviour, IDamageable
 {
     [Header("Flying Enemy Settings")]
     public float speed = 5f;
@@ -32,29 +32,27 @@ public class FlyingEnemy : MonoBehaviour
     public Animator animator;
     private bool isDead = false;
 
+    private Rigidbody2D rb;
 
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
+        rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null)
-        
             originalColor = spriteRenderer.color;
+        
         if(animator == null)
             animator = GetComponent<Animator>();
-
-
     }
 
-    // Update is called once per frame
     void Update()
     {
         if (player == null || isDead)
             return;
+        
         if (!isAttacking)
         {
             if (isChasing == true)
@@ -93,6 +91,7 @@ public class FlyingEnemy : MonoBehaviour
         else
             transform.rotation = Quaternion.Euler(0, 180, 0);
     }
+
     private IEnumerator PerformAttack()
     {
         isAttacking = true;
@@ -109,6 +108,7 @@ public class FlyingEnemy : MonoBehaviour
 
         isAttacking = false;
     }
+
     public void DealAttackDamage()
     {
         if (player == null) return;
@@ -119,6 +119,31 @@ public class FlyingEnemy : MonoBehaviour
             playerHealth.TakeDamage(attackDamage);
         }
     }
+
+    // NEW: Implement IDamageable interface for player combat system
+    public void TakeHit(DamageContext ctx)
+    {
+        if (isDead) return;
+
+        currentHealth -= ctx.damage;
+
+        // Apply knockback
+        if (rb != null)
+        {
+            rb.linearVelocity = ctx.knockback;
+        }
+
+        // Flash effect
+        if (spriteRenderer != null && !isFlashing)
+            StartCoroutine(Flash());
+
+        Debug.Log($"{gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
+
+        if (currentHealth <= 0)
+            Die();
+    }
+
+    // Keep old TakeDamage method for backwards compatibility
     public void TakeDamage(int damage)
     {
         if (isDead) return;
@@ -145,6 +170,8 @@ public class FlyingEnemy : MonoBehaviour
     {
         isDead = true;
 
+        Debug.Log($"{gameObject.name} died!");
+
         // Trigger the death animation
         if (animator != null)
             animator.SetTrigger("IsDead"); // Make sure this trigger exists in your Animator
@@ -154,5 +181,10 @@ public class FlyingEnemy : MonoBehaviour
         Collider2D col = GetComponent<Collider2D>();
         if (col != null)
             col.enabled = false;
+
+        // Destroy after animation
+        Destroy(gameObject, 2f);
     }
 }
+
+

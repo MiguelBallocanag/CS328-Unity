@@ -23,13 +23,13 @@ public class EnemyPatrol : MonoBehaviour
     [Header("Enemy Animation")]
     [SerializeField] private Animator anim;
 
+    private bool isDead = false;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         initScale = enemy.localScale;
     }
-    
     
     private void OnDisable()
     {
@@ -40,11 +40,17 @@ public class EnemyPatrol : MonoBehaviour
         {
             rb.linearVelocity = Vector2.zero;
         }
-        
     }
 
     private void FixedUpdate()
     {
+        if (isDead)
+        {
+            if (rb != null)
+                rb.linearVelocity = Vector2.zero;
+            return;
+        }
+
         if (IsPerformingAction())
         {
             anim.SetBool("Moving", false);
@@ -67,6 +73,7 @@ public class EnemyPatrol : MonoBehaviour
                 DirectionChange();
         }
     }
+
     private bool IsPerformingAction()
     {
         var stateInfo = anim.GetCurrentAnimatorStateInfo(0);
@@ -77,7 +84,6 @@ public class EnemyPatrol : MonoBehaviour
     {
         anim.SetBool("Moving", false);
         rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
-
 
         idleTimer += Time.deltaTime;
         if (idleTimer >= idleDuration)
@@ -98,7 +104,16 @@ public class EnemyPatrol : MonoBehaviour
         anim.SetBool("Moving", true);
         enemy.localScale = new Vector3(Mathf.Abs(initScale.x) * _direction, initScale.y, initScale.z);
         rb.linearVelocity = new Vector2(_direction * speed, rb.linearVelocity.y);
+    }
 
+    // Called by EnemyHealth when this enemy dies
+    public void OnDeath()
+    {
+        isDead = true;
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+        if (anim != null)
+            anim.SetBool("Moving", false);
     }
 
     private void OnDrawGizmos()
@@ -107,5 +122,6 @@ public class EnemyPatrol : MonoBehaviour
         Gizmos.DrawWireSphere(rightEdge.transform.position, 0.1f);
         Gizmos.DrawLine(leftEdge.transform.position, rightEdge.transform.position);
     }
-
 }
+
+

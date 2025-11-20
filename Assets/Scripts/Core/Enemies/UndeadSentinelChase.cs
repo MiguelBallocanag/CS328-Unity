@@ -11,17 +11,19 @@ public class UndeadSentinelChase : MonoBehaviour
     [Header("Status")]
     private GameObject player;
     public bool isChasing = false;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+
+    private Rigidbody2D rb;
+    private bool isDead = false;
+
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-
+        rb = GetComponent<Rigidbody2D>();
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (player == null)
+        if (player == null || isDead)
             return;
 
         if (isChasing)
@@ -39,11 +41,11 @@ public class UndeadSentinelChase : MonoBehaviour
     {
         transform.position = Vector2.MoveTowards(transform.position, player.transform.position, chaseSpeed * Time.deltaTime);
     }
+
     private void ReturnToStartingPoint()
     {
         if (startingPoint != null)
             transform.position = Vector2.MoveTowards(transform.position, startingPoint.position, chaseSpeed * Time.deltaTime);
-
     }
 
     private void Flip()
@@ -51,5 +53,12 @@ public class UndeadSentinelChase : MonoBehaviour
         if (player == null)
             return;
         transform.rotation = player.transform.position.x < transform.position.x ? Quaternion.Euler(0, 0, 0) : Quaternion.Euler(0, 180, 0);
+    }
+
+    // Called by EnemyHealth when this enemy dies
+    public void OnDeath()
+    {
+        isDead = true;
+        this.enabled = false;
     }
 }
