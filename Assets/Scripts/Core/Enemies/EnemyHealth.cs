@@ -1,7 +1,8 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-public class EnemyHealth : MonoBehaviour
+
+public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [Header("Enemy Health Settings")]
     public int maxHealth = 3;
@@ -16,10 +17,12 @@ public class EnemyHealth : MonoBehaviour
     private string paramHurt;
 
     private EnemyAttack enemyAttack;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private Rigidbody2D rb;
+
     void Start()
     {
         enemyAttack = GetComponent<EnemyAttack>();
+        rb = GetComponent<Rigidbody2D>();
         currentHealth = maxHealth;
         animator = GetComponent<Animator>();
 
@@ -35,35 +38,83 @@ public class EnemyHealth : MonoBehaviour
         }
     }
 
-
-    // Method to apply damage to the enemy
-    public void TakeDamage(int damage)
+    // NEW: Implement IDamageable interface for player combat system
+    public void TakeHit(DamageContext ctx)
     {
         if (isDead) return;
 
-        currentHealth -= damage;
-        animator.SetTrigger(paramHurt);
+        currentHealth -= ctx.damage;
+        
+        // Apply knockback
+        if (rb != null)
+        {
+            rb.linearVelocity = ctx.knockback;
+        }
+
+        // Trigger hurt animation
+        if (animator != null)
+        {
+            animator.SetTrigger(paramHurt);
+        }
+
+        Debug.Log($"{gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
+
         if (currentHealth <= 0)
         {
             Die();
         }
     }
-    // Method to handle enemy death
+
+    // Keep old TakeDamage for backwards compatibility (if other systems use it)
+    public void TakeDamage(int damage)
+    {
+        if (isDead) return;
+
+        currentHealth -= damage;
+        
+        if (animator != null)
+        {
+            animator.SetTrigger(paramHurt);
+        }
+        
+        if (currentHealth <= 0)
+        {
+            Die();
+        }
+    }
+
     public void Die()
     {
         if(isDead) return;
-        animator.SetTrigger(paramDeath);
+        isDead = true;
+        
+        Debug.Log($"{gameObject.name} died!");
+        
+        if (animator != null)
+        {
+            animator.SetTrigger(paramDeath);
+        }
 
         if(enemyAttack != null)
         {
             enemyAttack.OnEnemyDeath();
         }
-        // Disable the enemy's collider and other components to prevent further interaction
-         Collider2D col = GetComponent<Collider2D>();
+
+        // Disable the enemy's collider to prevent further interaction
+        Collider2D col = GetComponent<Collider2D>();
         if (col != null)
             col.enabled = false;
-        // Destroy the enemy game object after a delay to allow death animation to play
-        Destroy(gameObject, 2f);
 
+        // Disable movement scripts
+        EnemyPatrol patrol = GetComponent<EnemyPatrol>();
+        if (patrol != null)
+            patrol.enabled = false;
+
+        UndeadSentinelChase chase = GetComponent<UndeadSentinelChase>();
+        if (chase != null)
+            chase.enabled = false;
+
+        // Destroy the enemy after animation plays
+        Destroy(gameObject, 2f);
     }
 }
