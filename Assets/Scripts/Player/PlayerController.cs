@@ -200,10 +200,8 @@ public class PlayerController : MonoBehaviour
         if (!jumpData) return;
         jumpData.Compute();
         Gravity = jumpData.gravity;
-        JumpVelocity = jumpData.jumpVelocity;
-        // Removed old ratchet; rise clamping is handled in JumpState.
+        // Apply both multipliers: base tuning (in jumpVelocity) + hazard effect (swampJumpMult)
         JumpVelocity = jumpData.jumpVelocity * swampJumpMult;
-
     }
 
     void Awake()
@@ -215,7 +213,6 @@ public class PlayerController : MonoBehaviour
         ApplyJumpTuning();
 
         if (animator == null) animator = GetComponentInChildren<Animator>(true);
-        if (sr == null) sr = GetComponentInChildren<SpriteRenderer>(true);
         animFx = new Anim(animator);
     }
 
@@ -322,6 +319,7 @@ public class PlayerController : MonoBehaviour
         {
             var v = rb.linearVelocity;
             if (v.y < -maxFallSpeed) v.y = -maxFallSpeed;
+            // NOTE: Not clamping rise speed to allow full jump height
             rb.linearVelocity = v;
         }
 

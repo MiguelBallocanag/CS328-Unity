@@ -29,28 +29,19 @@ public class JumpState : AirState
             return;
         }
 
-        // standard aerial movement + base gravity
+        // standard aerial movement
         ApplyAirMotion();
+        
+        // Apply gravity with early cut for variable jump height
         ApplyBaseGravity();
-
-        // variable jump: short hop = release = add extra gravity
         ApplyEarlyCutIfNeeded();
 
-        //
-        // ✅ FIX FOR THE `jumpHeight doesn't change full hop`
-        //    After heldCutTime, DO NOT apply earlyCut gravity (which destroyed full hop height)
-        //    Instead, only apply base gravity, respecting JumpData.Compute() (height & apex time)
-        //
-        if (pc.rb.linearVelocity.y > 0f && _riseTime >= pc.jumpData.heldCutTime)
-        {
-            pc.rb.linearVelocity += Vector2.up * (-pc.Gravity * Time.deltaTime);
-        }
-
-        //
-        // ✅ Optional but important: enforce kinematic apex (prevents overshoot on high fps)
-        //
+        // Prevent velocity from exceeding initial jump velocity (fixes off-screen launch bug)
+        // This caps upward velocity to the jump velocity, preventing physics errors
         if (pc.rb.linearVelocity.y > pc.JumpVelocity)
+        {
             pc.rb.linearVelocity = new Vector2(pc.rb.linearVelocity.x, pc.JumpVelocity);
+        }
 
         // heavier fall / fast fall when descending
         ApplyHeavierFall();

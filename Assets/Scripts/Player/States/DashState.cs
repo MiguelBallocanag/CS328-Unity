@@ -50,7 +50,8 @@ public class DashState : BaseState {
     }
 
     public override void Tick() {
-        _t -= Time.deltaTime;
+        // FIXED: Use fixedDeltaTime for frame-rate independent physics
+        _t -= Time.fixedDeltaTime;
 
         // keep dash velocity stable while active (prevents air drag shaping it)
         if (_t > 0f) {

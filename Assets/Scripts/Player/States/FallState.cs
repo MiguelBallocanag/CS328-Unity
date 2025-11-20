@@ -45,9 +45,9 @@ public class FallState : AirState
         ApplyBaseGravity();
         ApplyHeavierFall();
 
-        // Cap rise (shouldn't happen in fall, but keep symmetric)
-        if (pc.rb.linearVelocity.y > pc.JumpVelocity)
-            pc.rb.linearVelocity = new Vector2(pc.rb.linearVelocity.x, pc.JumpVelocity);
+        // Removed: Unnecessary velocity cap that could interfere with launches/bounces
+        // FallState should only handle falling - if something launches you up, 
+        // you transition to JumpState anyway
 
         // Buffered air jump
         if (!pc.IsGrounded && pc.lastPressedJumpTime > 0f && pc.airJumpsLeft > 0)

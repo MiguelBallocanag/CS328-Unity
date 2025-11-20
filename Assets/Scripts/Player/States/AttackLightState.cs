@@ -39,7 +39,8 @@ public class AttackLightState : AirState {
     }
 
     public override void Tick() {
-        float dt = Time.deltaTime;
+        // FIXED: Use fixedDeltaTime for frame-rate independent physics
+        float dt = Time.fixedDeltaTime;
         timer += dt;
 
         // light locomotion while attacking
@@ -139,7 +140,8 @@ public class AttackLightState : AirState {
         float vx = pc.rb.linearVelocity.x;
         float cap = Mathf.Max(pc.runSpeed, pc.maxAirSpeed);
         float target = x * cap;
-        float accel = (Mathf.Abs(x) > 0.01f ? pc.airAccel : pc.airDecel) * Time.deltaTime;
+        // FIXED: Use fixedDeltaTime for consistent physics
+        float accel = (Mathf.Abs(x) > 0.01f ? pc.airAccel : pc.airDecel) * Time.fixedDeltaTime;
         float newVx = Mathf.MoveTowards(vx, target, accel);
         pc.rb.linearVelocity = new Vector2(newVx, pc.rb.linearVelocity.y);
     }
@@ -147,7 +149,8 @@ public class AttackLightState : AirState {
     private void ApplyGroundControlLight() {
         float x = pc.moveInput.x;
         float target = x * pc.runSpeed;
-        float accel  = (Mathf.Abs(x) > 0.01f ? pc.groundAccel : pc.groundDecel) * Time.deltaTime;
+        // FIXED: Use fixedDeltaTime for consistent physics
+        float accel  = (Mathf.Abs(x) > 0.01f ? pc.groundAccel : pc.groundDecel) * Time.fixedDeltaTime;
         float newVx  = Mathf.MoveTowards(pc.rb.linearVelocity.x, target, accel);
         pc.rb.linearVelocity = new Vector2(newVx, pc.rb.linearVelocity.y);
     }
