@@ -82,4 +82,9 @@ public class PlayerHealth : MonoBehaviour
         // Reset death state
         isDead = false;
     }
+    public void HealToFull()
+    {
+        currentHealth = maxHealth;
+        UpdateHealthBar();
+    }
 }
