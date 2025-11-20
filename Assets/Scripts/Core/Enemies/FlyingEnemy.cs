@@ -8,7 +8,7 @@ public class FlyingEnemy : MonoBehaviour
     public float speed = 5f;
     public bool isChasing = false;
     public GameObject player;
-    public Transform startingPoint;
+    public Transform StartingPoint;
 
     [Header("Health Settings")]
     public int maxHealth = 1;
@@ -80,7 +80,7 @@ public class FlyingEnemy : MonoBehaviour
 
     private void ReturnStartPoint()
     {
-        transform.position = Vector2.MoveTowards(transform.position, startingPoint.position, speed * Time.deltaTime);
+        transform.position = Vector2.MoveTowards(transform.position, StartingPoint.position, speed * Time.deltaTime);
     }
 
     private void Flip()
