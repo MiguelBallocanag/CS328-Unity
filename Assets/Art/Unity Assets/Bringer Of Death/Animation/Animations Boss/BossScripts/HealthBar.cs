@@ -5,31 +5,57 @@ using System.Collections.Generic;
 
 public class HealthBar : MonoBehaviour
 {
-
+    [Header("Health Bar UI")]
     public Slider slider;
     public Slider BossEaseHealthbar;
+    
+    [Header("Visual Settings")]
     public Gradient gradient;
     public Image fill;
-    private float lerpSpeed = 0.5f;
-    private float healthValue;
+    
+    [Header("Animation")]
+    public float lerpSpeed = 0.5f;
 
     private void Update()
     {
-        if (BossEaseHealthbar.value != slider.value)
+        // Smoothly animate health bar changes
+        if (BossEaseHealthbar != null && slider != null && BossEaseHealthbar.value != slider.value)
         {
             BossEaseHealthbar.value = Mathf.Lerp(BossEaseHealthbar.value, slider.value, Time.deltaTime * lerpSpeed);
-            fill.color = gradient.Evaluate(BossEaseHealthbar.normalizedValue);
+            
+            if (fill != null && gradient != null)
+            {
+                fill.color = gradient.Evaluate(BossEaseHealthbar.normalizedValue);
+            }
         }
     }
+    
+    // FIXED: Now actually updates the slider value
     public void SetHealth(int health)
     {
-       healthValue = health;
+        if (slider != null)
+        {
+            slider.value = health;
+        }
     }
+    
     public void SetMaxHealth(int health)
-    {  
-        healthValue = health;
-        slider.maxValue = health;
-        slider.value = health;
-        fill.color=gradient.Evaluate(1f);
+    {
+        if (slider != null)
+        {
+            slider.maxValue = health;
+            slider.value = health;
+        }
+        
+        if (BossEaseHealthbar != null)
+        {
+            BossEaseHealthbar.maxValue = health;
+            BossEaseHealthbar.value = health;
+        }
+        
+        if (fill != null && gradient != null)
+        {
+            fill.color = gradient.Evaluate(1f);
+        }
     }
 }

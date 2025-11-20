@@ -17,10 +17,10 @@ MonoBehaviour:
   recovery: 0.12
   damage: 10
   hitstun: 0.12
-  knockback: {x: 6, y: 3}
+  knockback: {x: 2, y: 0}
   boxSize: {x: 1.1, y: 0.6}
   localOffset: {x: 0.8, y: 0.1}
   targets:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 384
   maxHitsPerSwing: 1

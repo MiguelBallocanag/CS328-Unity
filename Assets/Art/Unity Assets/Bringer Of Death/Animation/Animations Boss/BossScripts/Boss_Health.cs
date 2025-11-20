@@ -51,7 +51,15 @@ public class Boss_Health : MonoBehaviour, IDamageable
         // Trigger hurt animation if exists
         if (animator != null)
         {
-            animator.SetTrigger("Hurt");
+            // Try to trigger hurt animation (boss might not have one)
+            try
+            {
+                animator.SetTrigger("Hurt");
+            }
+            catch
+            {
+                // Boss doesn't have Hurt animation, that's okay
+            }
         }
 
         // Update health bar
