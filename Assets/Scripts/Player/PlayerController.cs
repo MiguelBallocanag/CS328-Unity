@@ -69,6 +69,12 @@ public class PlayerController : MonoBehaviour
 
     int _lastAttackAnimFrame = -1; // keep
 
+    [Header("Hazard Effects")]
+    public float swampSpeedMult = 1f;
+    public bool swampJumpLock = false;
+    public float swampJumpMult = 1f;
+
+
     // =========================
     // Assists
     // =========================
@@ -196,6 +202,8 @@ public class PlayerController : MonoBehaviour
         Gravity = jumpData.gravity;
         JumpVelocity = jumpData.jumpVelocity;
         // Removed old ratchet; rise clamping is handled in JumpState.
+        JumpVelocity = jumpData.jumpVelocity * swampJumpMult;
+
     }
 
     void Awake()
@@ -317,6 +325,13 @@ public class PlayerController : MonoBehaviour
             rb.linearVelocity = v;
         }
 
+        if (swampSpeedMult < 1f)
+        {
+            var v = rb.linearVelocity;
+            v.x *= swampSpeedMult;
+            rb.linearVelocity = v;
+        }
+
         // Clear one-frame input flags AFTER physics consumed them
         jumpPressed = false;
         dashPressed = false;
@@ -326,6 +341,7 @@ public class PlayerController : MonoBehaviour
     public void OnMove(InputAction.CallbackContext c)
     {
         moveInput = c.ReadValue<Vector2>();
+        moveInput.x *= swampSpeedMult;
     }
 
     public void OnJump(InputAction.CallbackContext ctx)
