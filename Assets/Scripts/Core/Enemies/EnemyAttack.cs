@@ -7,15 +7,13 @@ public class EnemyAttack : MonoBehaviour
     // Attack parameters
     [Header("Attack Parameters")]
     [SerializeField] private float attackcooldown = 2f;
-    [SerializeField] private int attackdamage =10;
-    [SerializeField] private float attackrange=0.5f;
+    [SerializeField] private int attackdamage = 10;
+    [SerializeField] private float attackrange = 0.5f;
     [SerializeField] private Transform attackPoint;
 
     [Header("Enemy Type Settings")]
     [SerializeField] private bool canBlock = false;
     [SerializeField] private bool isSentinel = false;
-    
-
 
     // References
     private Animator anim;
@@ -25,20 +23,14 @@ public class EnemyAttack : MonoBehaviour
     [Header("Player Parameters")]
     private float cooldownTimer = Mathf.Infinity;
     [SerializeField] private LayerMask Player;
-    //public LayerMask obstaclelayer;
-  
 
     private EnemyPatrol enemyPatrol;
     private bool isDead = false;
 
     // Animator parameters mapping
     private string paramAttack;
-    private string paramMove;
     private string paramBlock;
 
-
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         enemyPatrol = GetComponent<EnemyPatrol>();
@@ -49,25 +41,28 @@ public class EnemyAttack : MonoBehaviour
         {
             // Map Sentinel-specific animator parameters
             paramAttack = "swordAttack";
-            paramMove = "IsWalking";
-            paramBlock = "IsBlocking";//sentinel block parameter only
+            paramBlock = "IsBlocking";
         }
         else
-        { // Map standard enemy animator parameters
+        {
+            // Map standard enemy animator parameters
             paramAttack = "MeleeAttack";
-            paramMove = "Moving";
-            paramBlock = "";//no block parameter for standard enemy
+            paramBlock = "";
         }
-
     }
 
-
-
-    // Update is called once per frame
     void Update()
     {
         if (isDead)
             return;
+
+        // Safety check: stop if components are missing
+        if (player == null || attackPoint == null || anim == null)
+        {
+            this.enabled = false;
+            return;
+        }
+            
         cooldownTimer += Time.deltaTime;
 
         bool inSight = PlayerInSight();
@@ -87,45 +82,44 @@ public class EnemyAttack : MonoBehaviour
                 anim.SetTrigger(paramAttack);
             }
         }
-    }    
+    }
 
     // Check if the player is in sight using raycasting
     private bool PlayerInSight()
     {
+        // Safety check before accessing transform
+        if (attackPoint == null) return false;
         
         Collider2D hit = Physics2D.OverlapCircle(attackPoint.position, attackrange, Player);
         return hit != null;
-
     }
-    //void Attack()
-    //{
-    //    // Play attack animation
-    //    anim.SetTrigger("MeleeAttack");
-    //    Collider2D hit=Physics2D.OverlapCircle(transform.position, attackrange, playerlayer);
-        
-    //}
+
     // Deal damage to the player if in range
     public void DamagePlayer()
     {
+        // Safety check
+        if (attackPoint == null) return;
+        
         Collider2D hit = Physics2D.OverlapCircle(attackPoint.position, attackrange, Player);
-        if (hit !=null)
-        {// Deal damage to the player
+        if (hit != null)
+        {
+            // Deal damage to the player
             PlayerHealth ph = hit.GetComponent<PlayerHealth>();
             if (ph != null)
                 ph.TakeDamage(attackdamage);
         }
     }
+
     // Stop blocking after a short duration
     private void TryBlock()
     {
         if (string.IsNullOrEmpty(paramBlock))
             return;
 
-       
-            anim.SetBool(paramBlock, true);
-            StartCoroutine(StopBlocking());
-        
+        anim.SetBool(paramBlock, true);
+        StartCoroutine(StopBlocking());
     }
+
     public void OnEnemyDeath()
     {
         isDead = true;
@@ -142,6 +136,7 @@ public class EnemyAttack : MonoBehaviour
         {
             enemyPatrol.enabled = false;
         }
+        
         StopAllCoroutines();
         this.enabled = false; // fully disable attacking
     }
@@ -152,10 +147,12 @@ public class EnemyAttack : MonoBehaviour
         anim.SetBool(paramBlock, false);
     }
 
-    //Visualize the attack range in the editor
+    // Visualize the attack range in the editor
     void OnDrawGizmosSelected()
     {
+        if (attackPoint == null) return;
+        
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(attackPoint.position, attackrange);// Draw a wire sphere to represent the attack range
+        Gizmos.DrawWireSphere(attackPoint.position, attackrange);
     }
 }
