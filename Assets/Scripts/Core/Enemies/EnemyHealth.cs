@@ -5,7 +5,7 @@ using System.Collections.Generic;
 public class EnemyHealth : MonoBehaviour, IDamageable
 {
     [Header("Enemy Health Settings")]
-    public int maxHealth = 3;
+    public int maxHealth = 30;
     public int currentHealth;
     private Animator animator;
     private bool isDead = false;
@@ -45,6 +45,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
         currentHealth -= ctx.damage;
         
+        Debug.Log($"[TakeHit] {gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
+
         // Apply knockback
         if (rb != null)
         {
@@ -57,30 +59,31 @@ public class EnemyHealth : MonoBehaviour, IDamageable
             animator.SetTrigger(paramHurt);
         }
 
-        Debug.Log($"{gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
-
         if (currentHealth <= 0)
         {
             Die();
         }
     }
 
-    // Keep old TakeDamage for backwards compatibility (if other systems use it)
+    // OLD METHOD - DISABLED FOR NOW
     public void TakeDamage(int damage)
     {
-        if (isDead) return;
-
-        currentHealth -= damage;
+        Debug.LogWarning($"[OLD TakeDamage] called on {gameObject.name} - this should NOT be happening!");
+        // DO NOTHING - we only use TakeHit now
+        return;
         
+        /* COMMENTED OUT TO PREVENT DOUBLE DAMAGE
+        if (isDead) return;
+        currentHealth -= damage;
         if (animator != null)
         {
             animator.SetTrigger(paramHurt);
         }
-        
         if (currentHealth <= 0)
         {
             Die();
         }
+        */
     }
 
     public void Die()
@@ -88,7 +91,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if(isDead) return;
         isDead = true;
         
-        Debug.Log($"{gameObject.name} died!");
+        Debug.Log($"[Die] {gameObject.name} died!");
         
         if (animator != null)
         {
@@ -100,10 +103,18 @@ public class EnemyHealth : MonoBehaviour, IDamageable
             enemyAttack.OnEnemyDeath();
         }
 
-        // Disable the enemy's collider to prevent further interaction
+        // FIXED: Freeze physics instead of disabling collider
+        // This keeps the corpse on the ground during death animation
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Static; // Freeze in place
+        }
+
+        // Make collider a trigger so player can walk through corpse
         Collider2D col = GetComponent<Collider2D>();
         if (col != null)
-            col.enabled = false;
+            col.isTrigger = true;
 
         // Disable movement scripts
         EnemyPatrol patrol = GetComponent<EnemyPatrol>();

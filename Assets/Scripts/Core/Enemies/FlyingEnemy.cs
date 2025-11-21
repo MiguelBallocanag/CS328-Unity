@@ -11,9 +11,8 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     public Transform StartingPoint;
 
     [Header("Health Settings")]
-    public int maxHealth = 1;
+    public int maxHealth = 10;
     private int currentHealth;
-
 
     [Header("Flashing Settings")]
     public float flashDuration = 0.1f;
@@ -23,9 +22,9 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
     private bool isFlashing = false;
 
     [Header("Combat Settings")]
-    public int attackDamage = 1; // Damage dealt per attack
-    public float attackRange = 1f; // Range within which the enemy can attack
-    public float attackCooldown = 1f; // Time between attacks in seconds
+    public int attackDamage = 1;
+    public float attackRange = 1f;
+    public float attackCooldown = 1f;
     private bool isAttacking = false;
 
     [Header("Animator")]
@@ -66,10 +65,8 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
     private void Chase()
     {
-        // Move toward player
         transform.position = Vector2.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
 
-        // Attack if in range and not currently attacking
         if (Vector2.Distance(transform.position, player.transform.position) <= attackRange && !isAttacking)
         {
             StartCoroutine(PerformAttack());
@@ -97,13 +94,10 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         isAttacking = true;
 
         if (animator != null)
-            animator.SetTrigger("IsAttacking");  // Trigger attack animation
+            animator.SetTrigger("IsAttacking");
 
-        // Wait for attack animation length (adjust to match animation)
         float attackAnimLength = 0.5f;
         yield return new WaitForSeconds(attackAnimLength);
-
-        // Optional pause between attacks
         yield return new WaitForSeconds(attackCooldown);
 
         isAttacking = false;
@@ -120,41 +114,30 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         }
     }
 
-    // NEW: Implement IDamageable interface for player combat system
     public void TakeHit(DamageContext ctx)
     {
         if (isDead) return;
 
         currentHealth -= ctx.damage;
 
-        // Apply knockback
+        Debug.Log($"[TakeHit] {gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
+
         if (rb != null)
         {
             rb.linearVelocity = ctx.knockback;
         }
 
-        // Flash effect
         if (spriteRenderer != null && !isFlashing)
             StartCoroutine(Flash());
-
-        Debug.Log($"{gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
 
         if (currentHealth <= 0)
             Die();
     }
 
-    // Keep old TakeDamage method for backwards compatibility
     public void TakeDamage(int damage)
     {
-        if (isDead) return;
-
-        currentHealth -= damage;
-
-        if (spriteRenderer != null && !isFlashing)
-            StartCoroutine(Flash());
-
-        if (currentHealth <= 0)
-            Die();
+        Debug.LogWarning($"[OLD TakeDamage] called on {gameObject.name}");
+        return;
     }
 
     private IEnumerator Flash()
@@ -168,23 +151,25 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
     private void Die()
     {
+        if (isDead) return;
         isDead = true;
 
-        Debug.Log($"{gameObject.name} died!");
+        Debug.Log($"[Die] {gameObject.name} died!");
 
-        // Trigger the death animation
         if (animator != null)
-            animator.SetTrigger("IsDead"); // Make sure this trigger exists in your Animator
+            animator.SetTrigger("IsDead");
 
-        // Stop movement and disable collisions
-        this.enabled = false;
+        if (rb != null)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.bodyType = RigidbodyType2D.Static;
+        }
+
         Collider2D col = GetComponent<Collider2D>();
         if (col != null)
-            col.enabled = false;
+            col.isTrigger = true;
 
-        // Destroy after animation
+        this.enabled = false;
         Destroy(gameObject, 2f);
     }
 }
-
-
