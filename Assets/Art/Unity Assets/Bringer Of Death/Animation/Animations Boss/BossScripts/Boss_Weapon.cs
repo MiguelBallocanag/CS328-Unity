@@ -1,57 +1,82 @@
-using System.Collections;
-using System.Collections.Generic;   
 using UnityEngine;
 
 public class Boss_Weapon : MonoBehaviour
 {
-    public int damage = 20;
+    [Header("Attack Settings")]
+    public int attackDamage = 20;
     public int magicDamage = 30;
 
-    public Vector3 attackOffset;
-    public float attackrange = 0.5f;
-    public LayerMask attackMask;
+    [Header("Attack Hitbox")]
+    public Vector3 attackOffset = new Vector3(1.5f, 0f, 0f);
+    public float attackRange = 1.5f;
+    public LayerMask playerLayer;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    //public void Attack()
-    //{
-    //    Vector3 pos = transform.position;
-    //    pos += transform.right * attackOffset.x;
-    //    pos += transform.up * attackOffset.y;
+    // Called by animation event during Boss_Attacking animation
+    public void Attack()
+    {
+        Debug.Log("[Boss_Weapon] Attack() called!");
+        
+        // Calculate attack position (offset from boss position)
+        Vector3 attackPos = transform.position;
+        attackPos += transform.right * attackOffset.x;
+        attackPos += transform.up * attackOffset.y;
 
-    //    Collider2D colInfo = Physics2D.OverlapCircle(pos, attackrange, attackMask);
-    //    if (colInfo != null)
-    //    {
-    //        if (colInfo.CompareTag("DrawCharacter"))
-    //        {
-    //            colInfo.GetComponent<>(DrawCharacter).TakeDamage(damage);
-    //        }
+        // Check for player in attack range
+        Collider2D hitPlayer = Physics2D.OverlapCircle(attackPos, attackRange, playerLayer);
+        
+        if (hitPlayer != null && hitPlayer.CompareTag("Player"))
+        {
+            Debug.Log($"[Boss_Weapon] Hit player: {hitPlayer.name}");
             
-    //    }
-
+            PlayerHealth playerHealth = hitPlayer.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(attackDamage);
+                Debug.Log($"[Boss_Weapon] Dealt {attackDamage} damage to player!");
+            }
+        }
+        else
+        {
+            Debug.Log("[Boss_Weapon] Attack missed - no player in range");
+        }
     }
 
-    // Update is called once per frame
-    //public void SecondPhaseAttack()
-    //{ Vector3 pos = transform.position;
-    //    pos += transform.right * attackOffset.x;
-    //    pos += transform.up * attackOffset.y;
-    //    Collider2D colInfo = Physics2D.OverlapCircle(pos, attackrange, attackMask);
-    //    if (colInfo != null)
-    //    {
-    //        if (colInfo.CompareTag("DrawCharacter"))
-    //        {
-    //            colInfo.GetComponent<>().TakeMagicDamage(magicDamage);
-    //        }
+    // Called by animation event during Boss_Magic animation (second phase)
+    public void SecondPhaseAttack()
+    {
+        Debug.Log("[Boss_Weapon] SecondPhaseAttack() called!");
+        
+        Vector3 attackPos = transform.position;
+        attackPos += transform.right * attackOffset.x;
+        attackPos += transform.up * attackOffset.y;
 
-    //    }
+        Collider2D hitPlayer = Physics2D.OverlapCircle(attackPos, attackRange, playerLayer);
+        
+        if (hitPlayer != null && hitPlayer.CompareTag("Player"))
+        {
+            Debug.Log($"[Boss_Weapon] Magic hit player: {hitPlayer.name}");
+            
+            PlayerHealth playerHealth = hitPlayer.GetComponent<PlayerHealth>();
+            if (playerHealth != null)
+            {
+                playerHealth.TakeDamage(magicDamage);
+                Debug.Log($"[Boss_Weapon] Dealt {magicDamage} magic damage to player!");
+            }
+        }
+        else
+        {
+            Debug.Log("[Boss_Weapon] Magic attack missed");
+        }
+    }
 
-    //}
-//    private void OnDrawGizmosSelected()
-//    {
-//        Vector3 pos = transform.position;
-//        pos += transform.right * attackOffset.x;
-//        pos += transform.up * attackOffset.y;
-//        Gizmos.color = Color.red;
-//        Gizmos.DrawWireSphere(pos, attackrange);
-//    }
-//}
+    // Visualize attack range in editor
+    private void OnDrawGizmosSelected()
+    {
+        Vector3 attackPos = transform.position;
+        attackPos += transform.right * attackOffset.x;
+        attackPos += transform.up * attackOffset.y;
+        
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(attackPos, attackRange);
+    }
+}
