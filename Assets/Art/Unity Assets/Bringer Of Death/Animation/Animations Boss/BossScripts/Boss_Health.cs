@@ -14,7 +14,7 @@ public class Boss_Health : MonoBehaviour, IDamageable
     public bool isInvulnerable = false;
     
     [Header("Health Bar")]
-    public GameObject healthBar;
+    public HealthBar healthBar;
     
     private Animator animator;
     private Rigidbody2D rb;
@@ -26,6 +26,14 @@ public class Boss_Health : MonoBehaviour, IDamageable
         rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         
+        // Initialize health bar
+        if (healthBar != null)
+        {
+            healthBar.SetMaxHealth(maxHealth);
+            healthBar.SetHealth(currentHealth);
+            healthBar.gameObject.SetActive(false); // Hide until boss activates
+        }
+        
         // Make sure Rigidbody2D is Dynamic
         if (rb != null && rb.bodyType != RigidbodyType2D.Dynamic)
         {
@@ -33,7 +41,6 @@ public class Boss_Health : MonoBehaviour, IDamageable
         }
     }
 
-    // Implement IDamageable for player attacks
     public void TakeHit(DamageContext ctx)
     {
         if (isDead || isInvulnerable) return;
@@ -49,20 +56,15 @@ public class Boss_Health : MonoBehaviour, IDamageable
         }
 
         // Trigger hurt animation if exists
-        if (animator != null)
+        if (animator != null && HasAnimatorParameter(animator, "Hurt"))
         {
-            // Try to trigger hurt animation (boss might not have one)
-            try
-            {
-                animator.SetTrigger("Hurt");
-            }
-            catch
-            { 
-                // Boss doesn't have Hurt animation, that's okay
-            }
-
+            animator.SetTrigger("Hurt");
         }
-        AudioManager.Instance.PlayBossHurt();
+        
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBossHurt();
+        }
 
         // Update health bar
         UpdateHealthBar();
@@ -73,13 +75,16 @@ public class Boss_Health : MonoBehaviour, IDamageable
         }
     }
 
-    // Keep old TakeDamage for compatibility
     public void TakeDamage(int damage)
     {
         if (isDead || isInvulnerable) return;
 
         currentHealth -= damage;
-        AudioManager.Instance.PlayBossHurt();
+        
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBossHurt();
+        }
 
         Debug.Log($"[Boss TakeDamage] {gameObject.name} took {damage} damage. Health: {currentHealth}/{maxHealth}");
 
@@ -93,11 +98,9 @@ public class Boss_Health : MonoBehaviour, IDamageable
 
     void UpdateHealthBar()
     {
-        // Update your health bar UI here if you have one
         if (healthBar != null)
         {
-            // Assuming you have a script on healthBar that updates it
-            // healthBar.GetComponent<HealthBarScript>().SetHealth(currentHealth, maxHealth);
+            healthBar.SetHealth(currentHealth);
         }
     }
 
@@ -111,9 +114,20 @@ public class Boss_Health : MonoBehaviour, IDamageable
         // Trigger death animation
         if (animator != null)
         {
-            animator.SetTrigger("Death");
+            if (HasAnimatorParameter(animator, "Death"))
+            {
+                animator.SetTrigger("Death");
+            }
+            else if (HasAnimatorParameter(animator, "IsDead"))
+            {
+                animator.SetBool("IsDead", true);
+            }
         }
-        AudioManager.Instance.PlayBossDeath();
+        
+        if (AudioManager.Instance != null)
+        {
+            AudioManager.Instance.PlayBossDeath();
+        }
 
         // Spawn death effect
         if (deathEffect != null)
@@ -134,7 +148,7 @@ public class Boss_Health : MonoBehaviour, IDamageable
             col.isTrigger = true;
 
         // Disable boss AI scripts
-        Boss bossAI = GetComponent<Boss>();
+        BossReaper bossAI = GetComponent<BossReaper>();
         if (bossAI != null)
             bossAI.enabled = false;
 
@@ -144,13 +158,12 @@ public class Boss_Health : MonoBehaviour, IDamageable
 
         // Hide health bar
         if (healthBar != null)
-            healthBar.SetActive(false);
+            healthBar.gameObject.SetActive(false);
 
         // Destroy after animation
         Destroy(gameObject, 3f);
     }
 
-    // Public method to set invulnerability (for boss phases)
     public void SetInvulnerable(bool invulnerable)
     {
         isInvulnerable = invulnerable;
@@ -160,9 +173,29 @@ public class Boss_Health : MonoBehaviour, IDamageable
     public void BossActive()
     {
         Debug.Log($"[Boss_Health] {gameObject.name} is now active!");
+        
         // Enable boss AI if disabled
-        Boss bossAI = GetComponent<Boss>();
+        BossReaper bossAI = GetComponent<BossReaper>();
         if (bossAI != null)
+        {
             bossAI.enabled = true;
+            bossAI.ActivateBoss(); // NEW: Explicitly activate the boss
+        }
+        
+        // Show health bar
+        if (healthBar != null)
+            healthBar.gameObject.SetActive(true);
+    }
+    
+    private bool HasAnimatorParameter(Animator anim, string paramName)
+    {
+        if (anim == null) return false;
+        
+        foreach (AnimatorControllerParameter param in anim.parameters)
+        {
+            if (param.name == paramName)
+                return true;
+        }
+        return false;
     }
 }

@@ -131,7 +131,7 @@ AnimatorState:
   m_PrefabAsset: {fileID: 0}
   m_Name: Boss_Idle
   m_Speed: 1
-  m_CycleOffset: 0
+  m_CycleOffset: 1
   m_Transitions:
   - {fileID: 6664456120625926850}
   m_StateMachineBehaviours: []
@@ -473,9 +473,9 @@ AnimatorStateTransition:
   m_Mute: 0
   m_IsExit: 0
   serializedVersion: 3
-  m_TransitionDuration: 0.1
-  m_TransitionOffset: 0
-  m_ExitTime: 0
+  m_TransitionDuration: 0.26575628
+  m_TransitionOffset: 0.0020208429
+  m_ExitTime: 0.0000000011041452
   m_HasExitTime: 0
   m_HasFixedDuration: 1
   m_InterruptionSource: 0
