@@ -71,6 +71,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
         {
             StartCoroutine(PerformAttack());
         }
+        AudioManager.Instance.PlayFlyingEnemySound();
     }
 
     private void ReturnStartPoint()
@@ -95,6 +96,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
         if (animator != null)
             animator.SetTrigger("IsAttacking");
+        AudioManager.Instance.PlayFlyingEnemyAttack();
 
         float attackAnimLength = 0.5f;
         yield return new WaitForSeconds(attackAnimLength);
@@ -129,6 +131,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
         if (spriteRenderer != null && !isFlashing)
             StartCoroutine(Flash());
+        AudioManager.Instance.PlayFlyingEnemyHurt();
 
         if (currentHealth <= 0)
             Die();
@@ -158,6 +161,7 @@ public class FlyingEnemy : MonoBehaviour, IDamageable
 
         if (animator != null)
             animator.SetTrigger("IsDead");
+        AudioManager.Instance.PlayFlyingEnemyDeath();
 
         if (rb != null)
         {

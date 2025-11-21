@@ -57,10 +57,12 @@ public class Boss_Health : MonoBehaviour, IDamageable
                 animator.SetTrigger("Hurt");
             }
             catch
-            {
+            { 
                 // Boss doesn't have Hurt animation, that's okay
             }
+
         }
+        AudioManager.Instance.PlayBossHurt();
 
         // Update health bar
         UpdateHealthBar();
@@ -77,6 +79,7 @@ public class Boss_Health : MonoBehaviour, IDamageable
         if (isDead || isInvulnerable) return;
 
         currentHealth -= damage;
+        AudioManager.Instance.PlayBossHurt();
 
         Debug.Log($"[Boss TakeDamage] {gameObject.name} took {damage} damage. Health: {currentHealth}/{maxHealth}");
 
@@ -110,6 +113,7 @@ public class Boss_Health : MonoBehaviour, IDamageable
         {
             animator.SetTrigger("Death");
         }
+        AudioManager.Instance.PlayBossDeath();
 
         // Spawn death effect
         if (deathEffect != null)

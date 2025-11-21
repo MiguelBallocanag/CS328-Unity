@@ -39,6 +39,7 @@ public class Boss_Weapon : MonoBehaviour
         {
             Debug.Log("[Boss_Weapon] Attack missed - no player in range");
         }
+        AudioManager.Instance.PlayBossAttack();    
     }
 
     // Called by animation event during Boss_Magic animation (second phase)
@@ -67,6 +68,7 @@ public class Boss_Weapon : MonoBehaviour
         {
             Debug.Log("[Boss_Weapon] Magic attack missed");
         }
+        AudioManager.Instance.PlayBossMagic();
     }
 
     // Visualize attack range in editor

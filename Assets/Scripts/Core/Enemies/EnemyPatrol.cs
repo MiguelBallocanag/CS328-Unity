@@ -24,6 +24,8 @@ public class EnemyPatrol : MonoBehaviour
     [SerializeField] private Animator anim;
 
     private bool isDead = false;
+    private float walkSoundTimer = 0f;
+    private float walkSoundInterval = 0.5f; // Time between walk sounds
 
     private void Awake()
     {
@@ -57,7 +59,7 @@ public class EnemyPatrol : MonoBehaviour
             rb.linearVelocity = new Vector2(0, rb.linearVelocity.y);
             return;
         }
-
+         walkSoundTimer += Time.fixedDeltaTime;
         if (movingLeft)
         {
             if (enemy.position.x >= leftEdge.position.x)
@@ -71,6 +73,11 @@ public class EnemyPatrol : MonoBehaviour
                 MoveInDirections(1, GetRb());
             else
                 DirectionChange();
+            if(anim.GetBool("Moving") && walkSoundTimer >= walkSoundInterval)
+            {
+                AudioManager.Instance.PlayEnemyMovement();
+                walkSoundTimer = 0f;
+            }
         }
     }
 

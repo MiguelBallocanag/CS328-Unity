@@ -4,12 +4,19 @@ public class Boss : MonoBehaviour
 {   
     [Header("References")]
     public Transform player;
-    
+    private Animator animator;
+
     [Header("Flip Settings")]
     public bool isFlipped = false;
 
+    [Header("Behavior Settings")]
+    public float chaseRange = 5f;
+    public float attackRange = 1.5f;
+    public bool isDead = false;
+
     void Start()
     {
+        animator = GetComponent<Animator>();
         // Auto-find player if not assigned
         if (player == null)
         {
@@ -23,6 +30,30 @@ public class Boss : MonoBehaviour
             {
                 Debug.LogError("[Boss] Could not find player! Make sure player has 'Player' tag.");
             }
+        }
+    }
+
+    void Update()
+    {
+        if (player == null || animator == null || isDead) return;
+
+        float distance = Vector2.Distance(transform.position, player.position);
+
+        // Walking logic
+        bool shouldWalk = distance <= chaseRange && distance > attackRange;
+        animator.SetBool("Moving", shouldWalk);
+
+        // Attack logic
+        if (distance <= attackRange)
+        {
+            animator.SetTrigger("Attack");
+        }
+
+        // Death logic (example trigger)
+        if (/* your health logic here */ false)
+        {
+            isDead = true;
+            animator.SetBool("IsDead", true);
         }
     }
 

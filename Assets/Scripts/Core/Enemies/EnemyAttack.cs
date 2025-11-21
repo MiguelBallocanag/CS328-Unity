@@ -80,6 +80,7 @@ public class EnemyAttack : MonoBehaviour
             {
                 cooldownTimer = 0;
                 anim.SetTrigger(paramAttack);
+                AudioManager.Instance.PlayEnemyAttack();
             }
         }
     }
@@ -115,6 +116,7 @@ public class EnemyAttack : MonoBehaviour
     {
         if (string.IsNullOrEmpty(paramBlock))
             return;
+        AudioManager.Instance.PlayEnemyBlock();
 
         anim.SetBool(paramBlock, true);
         StartCoroutine(StopBlocking());
@@ -123,6 +125,7 @@ public class EnemyAttack : MonoBehaviour
     public void OnEnemyDeath()
     {
         isDead = true;
+        AudioManager.Instance.PlayEnemyDeath();
 
         // Stop any running block
         if (!string.IsNullOrEmpty(paramBlock))

@@ -26,6 +26,7 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
+        AudioManager.Instance.PlayPlayerHurt();
 
         if (currentHealth <= 0)
         {
@@ -46,6 +47,7 @@ public class PlayerHealth : MonoBehaviour
 
         Debug.Log("Player Died!");
         StartCoroutine(HandleDeath());
+        AudioManager.Instance.PlayPlayerDeath();
     }
 
     public void Respawn()

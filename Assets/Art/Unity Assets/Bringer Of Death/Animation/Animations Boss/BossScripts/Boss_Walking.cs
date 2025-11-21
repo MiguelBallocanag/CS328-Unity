@@ -23,6 +23,7 @@ public class Boss_Walking : StateMachineBehaviour
         {
             Debug.LogError("[Boss_Walking] Could not find Player! Make sure player has 'Player' tag.");
         }
+        AudioManager.Instance.PlayBossMove();
     }
 
     // OnStateUpdate is called on each Update frame between OnStateEnter and OnStateExit callbacks

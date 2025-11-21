@@ -157,6 +157,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private SpriteRenderer sr;
     private Anim animFx;
 
+
     public void Anim_Jump()  => animFx?.Jump();
     public void Anim_Dash()  => animFx?.Dash();
     public void Anim_AttackTrigger() => animFx?.AttackTrigger();
@@ -272,6 +273,7 @@ public class PlayerController : MonoBehaviour
                 lastPressedJumpTime = jumpData.jumpBuffer;
                 jumpPressed = true;
                 _canDirJump = false;
+                AudioManager.Instance.PlayPlayerJump();
             }
 
             if (IsGrounded && _rearmBelowTime >= rearmMinTime)
@@ -348,6 +350,7 @@ public class PlayerController : MonoBehaviour
         {
             jumpPressed = true;
             lastPressedJumpTime = jumpData.jumpBuffer;
+            AudioManager.Instance.PlayPlayerJump();
         }
         // intentionally do NOT set jumpHeld here; we poll each frame in Update()
     }
@@ -355,12 +358,14 @@ public class PlayerController : MonoBehaviour
     public void OnDash(InputAction.CallbackContext ctx)
     {
         if (ctx.started && CanDashNow) dashPressed = true;
+        AudioManager.Instance.PlayPlayerDash();
     }
 
     public void OnAttack(InputAction.CallbackContext ctx) {
         if (ctx.started) {
             attackPressed = true;
             _attackBufferUntil = Time.time + attackBuffer;
+            AudioManager.Instance.PlayPlayerAttack();
         }
     }
 

@@ -58,6 +58,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         {
             animator.SetTrigger(paramHurt);
         }
+        AudioManager.Instance.PlayEnemyHurt();
 
         if (currentHealth <= 0)
         {
@@ -102,6 +103,7 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         {
             enemyAttack.OnEnemyDeath();
         }
+        AudioManager.Instance.PlayEnemyDeath();
 
         // FIXED: Freeze physics instead of disabling collider
         // This keeps the corpse on the ground during death animation
