@@ -102,6 +102,11 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if(enemyAttack != null)
         {
             enemyAttack.OnEnemyDeath();
+
+            WizardRangedAttack wizard = GetComponent<WizardRangedAttack>();
+            if (wizard != null)
+                wizard.OnEnemyDeath();
+
         }
         AudioManager.Instance.PlayEnemyDeath();
 
