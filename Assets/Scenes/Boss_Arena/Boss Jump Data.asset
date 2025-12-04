@@ -12,13 +12,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19cbe0dd72809d04095aa7e8f7f3c609, type: 3}
   m_Name: Boss Jump Data
   m_EditorClassIdentifier: Assembly-CSharp::JumpData
-  jumpHeight: 4
-  timeToApex: 0.28
+  jumpHeight: 7
+  timeToApex: 0.25
+  jumpPowerMultiplier: 0.8
   earlyCutMult: 2.6
   fallGravityMult: 1.15
   fastFallMult: 1.7
   coyoteTime: 0.1
   jumpBuffer: 0.1
   maxAirJumps: 1
-  gravity: 0
-  jumpVelocity: 0
+  heldCutTime: 0.18
+  gravity: 224
+  jumpVelocity: 44.8
