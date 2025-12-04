@@ -12,7 +12,7 @@ public class FallingSpikes : MonoBehaviour
     [Header("Falling Spikes Settings")]
     public float fallDelay = 0.5f;
     public float destroyAfterSeconds = 5f;
-    public layerMask playerLayer;
+    public LayerMask playerLayer;
 
     bool hasFallen = false;
     // Start is called before the first frame update
@@ -34,7 +34,7 @@ public class FallingSpikes : MonoBehaviour
         if (((1 << other.gameObject.layer) & playerLayer) != 0) 
         {
             hasFallen = true;
-            invoke(nameof(Fall), fallDelay);// Invoke the Fall method after the specified delay
+            Invoke(nameof(Fall), fallDelay);// Invoke the Fall method after the specified delay
         }// Check if the colliding object is in the player layer
     }
     void Fall() 

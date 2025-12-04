@@ -12,22 +12,27 @@ public class PlayerHealth : MonoBehaviour
     public PlayerController playerController; // Assign your player movement script here
 
     private bool isDead = false; // Prevents multiple death triggers
-
+    private bool isInvincible = false; // For future invincibility power-ups
     void Start()
     {
         currentHealth = maxHealth;
         UpdateHealthBar();
     }
 
+    public void SetInvincibility(bool invincible)
+    {
+        isInvincible = invincible;
+    }
     public void TakeDamage(int damage)
     {
+        if (isInvincible) return; // Don't take damage if invincible
         if (isDead) return; // Don't take damage if already dead
 
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
         AudioManager.Instance.PlayPlayerHurt();
-
+       
         if (currentHealth <= 0)
         {
             Die();
