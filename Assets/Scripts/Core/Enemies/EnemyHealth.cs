@@ -44,27 +44,34 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         if (isDead) return;
 
         currentHealth -= ctx.damage;
-        
-        Debug.Log($"[TakeHit] {gameObject.name} took {ctx.damage} damage. Health: {currentHealth}/{maxHealth}");
+        Debug.Log($"[TakeHit] {gameObject.name} Health: {currentHealth}/{maxHealth}");
 
-        // Apply knockback
+        //  SAFE KNOCKBACK (DamageContext is a struct, so no null check)
         if (rb != null)
         {
             rb.linearVelocity = ctx.knockback;
         }
 
-        // Trigger hurt animation
-        if (animator != null)
+        //  SAFE ANIMATION
+        if (animator != null && !string.IsNullOrEmpty(paramHurt))
         {
             animator.SetTrigger(paramHurt);
         }
-        AudioManager.Instance.PlayEnemyHurt();
 
+        //  SAFE AUDIO
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayEnemyHurt();
+
+        //  GUARANTEED DEATH
         if (currentHealth <= 0)
         {
+            Debug.Log("HEALTH <= 0 : CALLING DIE()");
             Die();
         }
     }
+
+
+
 
     // OLD METHOD - DISABLED FOR NOW
     public void TakeDamage(int damage)
@@ -89,50 +96,29 @@ public class EnemyHealth : MonoBehaviour, IDamageable
 
     public void Die()
     {
-        if(isDead) return;
+        if (isDead) return;
         isDead = true;
-        
-        Debug.Log($"[Die] {gameObject.name} died!");
-        
-        if (animator != null)
-        {
-            animator.SetTrigger(paramDeath);
-        }
 
-        if(enemyAttack != null)
-        {
+        Debug.Log("DIE FUNCTION EXECUTED ON: " + gameObject.name);
+
+        if (enemyAttack != null)
             enemyAttack.OnEnemyDeath();
 
-            WizardRangedAttack wizard = GetComponent<WizardRangedAttack>();
-            if (wizard != null)
-                wizard.OnEnemyDeath();
+        WizardRangedAttack wizard = GetComponent<WizardRangedAttack>();
+        if (wizard != null)
+            wizard.OnEnemyDeath();
 
-        }
-        AudioManager.Instance.PlayEnemyDeath();
+        if (AudioManager.Instance != null)
+            AudioManager.Instance.PlayEnemyDeath();
 
-        // FIXED: Freeze physics instead of disabling collider
-        // This keeps the corpse on the ground during death animation
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
-        {
-            rb.linearVelocity = Vector2.zero;
-            rb.bodyType = RigidbodyType2D.Static; // Freeze in place
-        }
+            rb.simulated = false;
 
-        // Make collider a trigger so player can walk through corpse
-        Collider2D col = GetComponent<Collider2D>();
-        if (col != null)
-            col.isTrigger = true;
+        foreach (Collider2D col in GetComponentsInChildren<Collider2D>())
+            col.enabled = false;
 
-        // Disable movement scripts
-        EnemyPatrol patrol = GetComponent<EnemyPatrol>();
-        if (patrol != null)
-            patrol.enabled = false;
-
-        UndeadSentinelChase chase = GetComponent<UndeadSentinelChase>();
-        if (chase != null)
-            chase.enabled = false;
-
-        // Destroy the enemy after animation plays
-        Destroy(gameObject, 2f);
+        // FULL ROOT DELETE
+        Destroy(transform.root.gameObject);
     }
 }
