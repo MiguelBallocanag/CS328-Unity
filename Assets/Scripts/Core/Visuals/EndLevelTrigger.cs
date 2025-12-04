@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
 
 public class EndLevelTrigger : MonoBehaviour
 {
@@ -13,30 +15,25 @@ public class EndLevelTrigger : MonoBehaviour
             hasTriggered = true;
             Debug.Log("Level Complete!");
 
-            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.StartCoroutine(TriggerEndScreen(playerHealth));
-            }
+            StartCoroutine(TriggerEndSequence());
         }
     }
 
-    private System.Collections.IEnumerator TriggerEndScreen(PlayerHealth playerHealth)
+    private IEnumerator TriggerEndSequence()
     {
         EndScreenController endScreen = Object.FindFirstObjectByType<EndScreenController>();
+
         if (endScreen != null)
         {
             endScreen.gameObject.SetActive(true);
-            yield return playerHealth.StartCoroutine(endScreen.FadeToBlack());
-            yield return new WaitForSeconds(2f);
-
-            // Optional: respawn player at start
-            playerHealth.Respawn();
-
-            yield return playerHealth.StartCoroutine(endScreen.FadeFromBlack());
-            endScreen.gameObject.SetActive(false);
+            yield return StartCoroutine(endScreen.FadeToBlack());
         }
 
-        hasTriggered = false;
+        // Small delay before loading next level
+        yield return new WaitForSeconds(1.5f);
+
+        // LOAD LEVEL 2
+        SceneManager.LoadScene("Level2_Cathedral");
     }
 }
+

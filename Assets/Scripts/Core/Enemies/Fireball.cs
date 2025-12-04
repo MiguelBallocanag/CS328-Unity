@@ -30,32 +30,27 @@ public class Fireball : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Try to damage ANY damageable object
-        IDamageable dmg = other.GetComponent<IDamageable>();
-        if (dmg == null)
-            dmg = other.GetComponentInParent<IDamageable>();
-
-        if (dmg != null)
+        // Player hit
+        if (other.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
-            DamageContext ctx = new DamageContext
+            PlayerHealth ph = other.GetComponent<PlayerHealth>();
+            if (ph != null)
             {
-                damage = damage,
-                knockback = Vector2.zero
-            };
+                ph.TakeDamage(damage);
+                Debug.Log("Fireball HIT PLAYER");
+            }
 
-            dmg.TakeHit(ctx);
-
-            // DESTROY IMMEDIATELY AFTER SUCCESSFUL DAMAGE
             Destroy(gameObject);
             return;
         }
 
-        // If it hit something solid (wall/ground/etc)
-        if (!other.isTrigger)
+        // Ground / Wall hit
+        if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             Destroy(gameObject);
         }
     }
+
 }
 
 

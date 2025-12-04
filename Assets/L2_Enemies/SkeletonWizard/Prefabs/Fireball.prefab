@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3228788839987675454}
   - component: {fileID: 2433910396402498172}
   - component: {fileID: 5145710545540446082}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Fireball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -193,4 +193,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   speed: 6
   lifetime: 3
-  damage: 10
+  damage: 20
