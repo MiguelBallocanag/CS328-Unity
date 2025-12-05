@@ -4,20 +4,23 @@ using System.Collections;
 public class LightBeam : MonoBehaviour
 {
     [Header("Child Objects")]
-    public GameObject warningBeam;  // Yellow transparent beam
-    public GameObject damageBeam;   // White damage beam
+    public GameObject warningBeam;
+    public GameObject damageBeam;
     
     [Header("Settings")]
     public int damage = 15;
+    public Vector2 beamSize = new Vector2(1f, 10f);
+    
+    [Header("Knockback")]
+    public float launchForce = 15f; // How hard to launch player up
     
     private float warningDuration;
     private float damageDuration;
     private bool isActive = false;
-    private bool hasDealtDamage = false; // Prevent multiple damage per beam
+    private bool hasDealtDamage = false;
     
     void Start()
     {
-        // Make sure damage beam is initially disabled
         if (damageBeam != null)
         {
             damageBeam.SetActive(false);
@@ -28,22 +31,18 @@ public class LightBeam : MonoBehaviour
     {
         warningDuration = warningTime;
         damageDuration = damageTime;
-        
         StartCoroutine(BeamSequence());
     }
     
     IEnumerator BeamSequence()
     {
-        // Phase 1: Warning (yellow beam, no damage)
         if (warningBeam != null)
         {
             warningBeam.SetActive(true);
         }
         
-        Debug.Log("[LightBeam] Warning phase...");
         yield return new WaitForSeconds(warningDuration);
         
-        // Phase 2: Damage (white beam, deals damage)
         if (warningBeam != null)
         {
             warningBeam.SetActive(false);
@@ -55,33 +54,50 @@ public class LightBeam : MonoBehaviour
         }
         
         isActive = true;
-        Debug.Log("[LightBeam] DAMAGE ACTIVE!");
-        
-        // Optional: Play beam sound
-        // AudioManager.Instance?.PlayLightBeam();
+        hasDealtDamage = false;
         
         yield return new WaitForSeconds(damageDuration);
         
-        // Cleanup
         isActive = false;
         Destroy(gameObject);
     }
     
-    // Deal damage once when player enters beam
-    void OnTriggerEnter2D(Collider2D other)
+    void Update()
     {
-        if (!isActive || hasDealtDamage) return;
-        
-        if (other.CompareTag("Player"))
+        if (isActive && !hasDealtDamage)
         {
-            Debug.Log($"[LightBeam] Player entered beam! Damage: {damage}");
-            
-            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
+            CheckForPlayer();
+        }
+    }
+    
+    void CheckForPlayer()
+    {
+        Collider2D[] hits = Physics2D.OverlapBoxAll(transform.position, beamSize, 0f);
+        
+        foreach (Collider2D hit in hits)
+        {
+            PlayerHealth playerHealth = hit.GetComponentInParent<PlayerHealth>();
             if (playerHealth != null)
             {
+                Debug.Log($"[LightBeam] HIT PLAYER! Damage: {damage}");
                 playerHealth.TakeDamage(damage);
-                hasDealtDamage = true; // Only damage once per beam activation
+                
+                // LAUNCH PLAYER INTO THE AIR!
+                Rigidbody2D playerRb = hit.GetComponentInParent<Rigidbody2D>();
+                if (playerRb != null)
+                {
+                    playerRb.linearVelocity = new Vector2(playerRb.linearVelocity.x, launchForce);
+                }
+                
+                hasDealtDamage = true;
+                return;
             }
         }
+    }
+    
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireCube(transform.position, beamSize);
     }
 }

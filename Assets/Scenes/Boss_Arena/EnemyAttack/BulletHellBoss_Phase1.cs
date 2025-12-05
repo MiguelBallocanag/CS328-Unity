@@ -127,11 +127,15 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     // ============================================================
     // MAIN ATTACK LOOP
     // ============================================================
+        // ============================================================
+    // MAIN ATTACK LOOP - RANDOMIZED
+    // ============================================================
+    private int lastPatternIndex = -1;
+    
     private IEnumerator AttackPattern()
     {
         while (true)
         {
-            // Small guard if stunned – just wait a frame
             if (isStunned)
             {
                 yield return null;
@@ -148,7 +152,10 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
                 if (isStunned) continue;
             }
 
-            // Melee if player is within melee circle
+            // Face player before attacking
+            FacePlayer();
+
+            // Melee if close
             if (player != null)
             {
                 float dist = Vector2.Distance(transform.position, player.position);
@@ -159,8 +166,16 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
                 }
             }
 
-            // Otherwise use ranged pattern
-            switch (currentPatternIndex)
+            // RANDOM attack - but don't repeat the same one twice
+            int pattern;
+            do
+            {
+                pattern = Random.Range(0, 4);
+            } while (pattern == lastPatternIndex);
+            
+            lastPatternIndex = pattern;
+
+            switch (pattern)
             {
                 case 0:
                     yield return StartCoroutine(PerformCircularBurst());
@@ -175,10 +190,9 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
                     yield return StartCoroutine(PerformLightBeams());
                     break;
             }
-
-            currentPatternIndex = (currentPatternIndex + 1) % 4;
         }
     }
+
 
     // ============================================================
     // MELEE (CIRCULAR RANGE)
@@ -227,6 +241,9 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     // ============================================================
     // AIMED SHOT
     // ============================================================
+        // ============================================================
+    // AIMED SHOT - MORE SPACED OUT
+    // ============================================================
     private IEnumerator PerformAimedShot()
     {
         if (animator != null)
@@ -241,9 +258,10 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
             Vector2 dir = (player.position - attackPoint.position).normalized;
             float ang = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
             SpawnOrbAngle(ang);
-            yield return new WaitForSeconds(0.1f);
+            yield return new WaitForSeconds(0.5f);  // Was 0.1f - now more spaced out
         }
     }
+
 
     // ============================================================
     // SPIRAL
@@ -347,6 +365,7 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
             Instantiate(teleportEffectPrefab, transform.position, Quaternion.identity);
     }
 
+    
 
     private Vector3 GetTeleportPosition()
     {
@@ -387,6 +406,40 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
          sr.flipX = true;
         }
     }
+        [Header("Movement")]
+    public float moveSpeed = 3f;
+    public float minDistanceToPlayer = 4f;
+    public bool enableMovement = true;
+    
+    void Update()
+    {
+        MoveTowardsPlayer();
+    }
+    
+        private void MoveTowardsPlayer()
+    {
+        if (!enableMovement || player == null || isStunned) return;
+        
+        float dist = Vector2.Distance(transform.position, player.position);
+        
+        if (dist > minDistanceToPlayer)
+        {
+            // ONLY MOVE ON X AXIS - no flying into ground
+            float directionX = Mathf.Sign(player.position.x - transform.position.x);
+            transform.position += new Vector3(directionX * moveSpeed * Time.deltaTime, 0f, 0f);
+            
+            FacePlayer();
+            
+            if (animator != null)
+                animator.SetBool("IsWalking", true);
+        }
+        else
+        {
+            if (animator != null)
+                animator.SetBool("IsWalking", false);
+        }
+    }
+
 
 
     // ============================================================

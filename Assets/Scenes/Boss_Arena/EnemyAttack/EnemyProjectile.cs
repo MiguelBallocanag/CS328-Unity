@@ -1,48 +1,44 @@
 using UnityEngine;
 
-public class EnemyProjectile : MonoBehaviour
+public class EnemyProjectile : MonoBehaviour, IDamageable
 {
     [Header("Settings")]
     public int damage = 10;
-    public float lifetime = 10f;
+    public float lifetime = 5f;
 
-    private Rigidbody2D rb;
     private Vector2 direction;
+    private float speed;
     private bool hasHit = false;
 
     void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        Rigidbody2D rb = GetComponent<Rigidbody2D>();
         if (rb != null)
         {
-            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.bodyType = RigidbodyType2D.Kinematic;
             rb.gravityScale = 0f;
-            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-            rb.freezeRotation = true;
+        }
+
+        Collider2D col = GetComponent<Collider2D>();
+        if (col != null)
+        {
+            col.isTrigger = true;
         }
     }
 
-    // Called by boss script
-    public void Initialize(Vector2 dir, float speed)
+    public void Initialize(Vector2 dir, float spd)
     {
         direction = dir.normalized;
-
-        if (rb != null)
-        {
-            rb.linearVelocity = direction * speed;
-        }
-    }
-
-    void FixedUpdate()
-    {
-        if (rb != null && !hasHit)
-        {
-            rb.linearVelocity = direction * rb.linearVelocity.magnitude;
-        }
+        speed = spd;
     }
 
     void Update()
     {
+        if (!hasHit)
+        {
+            transform.position += (Vector3)(direction * speed * Time.deltaTime);
+        }
+
         lifetime -= Time.deltaTime;
         if (lifetime <= 0f)
         {
@@ -54,24 +50,26 @@ public class EnemyProjectile : MonoBehaviour
     {
         if (hasHit) return;
 
-        Debug.Log($"[EnemyProjectile] Trigger with {other.name}, tag={other.tag}, layer={other.gameObject.layer}");
-
-        // Try to find PlayerHealth anywhere up the hierarchy
         PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>();
         if (playerHealth != null)
         {
-            Debug.Log($"[EnemyProjectile] Dealing {damage} damage to player");
             playerHealth.TakeDamage(damage);
             hasHit = true;
             Destroy(gameObject);
             return;
         }
 
-        // If it hits ground, walls, etc, destroy it too
         if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
             hasHit = true;
             Destroy(gameObject);
         }
+    }
+
+    // Player sword can destroy orbs!
+    public void TakeHit(DamageContext ctx)
+    {
+        Debug.Log("[EnemyProjectile] Orb destroyed by player!");
+        Destroy(gameObject);
     }
 }
