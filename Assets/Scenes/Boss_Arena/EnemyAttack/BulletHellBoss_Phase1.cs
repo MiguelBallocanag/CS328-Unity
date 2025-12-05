@@ -7,6 +7,7 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     public Transform player;
     public Transform attackPoint;
     public Animator animator;
+    public LayerMask groundLayer;
     
     [Header("Projectile Settings")]
     public GameObject orbPrefab;
@@ -16,6 +17,11 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     public GameObject lightBeamPrefab;
     public float beamWarningTime = 1f;
     public float beamDamageTime = 2f;
+    
+    [Header("Melee Attack")]
+    public float meleeRange = 3f;
+    public int meleeDamage = 20;
+    public float meleeKnockback = 8f;
     
     [Header("Attack Timing")]
     public float timeBetweenAttacks = 2f;
@@ -36,8 +42,14 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     public int beamCount = 3;
     public float beamSpacing = 3f;
     
-    [Header("Teleport Settings")]
+    [Header("Movement Settings")]
     public bool enableTeleport = true;
+    public bool enableGradualMovement = true;
+    public float walkSpeed = 2f;
+    public float walkChance = 0.4f; // 40% chance to walk instead of teleport
+    public float walkDuration = 1.5f;
+    
+    [Header("Teleport Settings")]
     public float minDistanceFromPlayer = 8f;
     public float maxDistanceFromPlayer = 15f;
     public float teleportCooldown = 5f;
@@ -45,11 +57,19 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     public GameObject teleportEffectPrefab;
     public float teleportFlashDuration = 0.3f;
     
+    [Header("Ground Check")]
+    public float groundCheckDistance = 2f;
+    public float minHeightAboveGround = 1f;
+    
     private int currentPatternIndex = 0;
     private float lastTeleportTime = -999f;
+    private bool isStunned = false;
+    private Rigidbody2D rb;
     
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();
+        
         if (player == null)
         {
             GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
@@ -61,6 +81,11 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
             animator = GetComponent<Animator>();
             if (animator == null) animator = GetComponentInChildren<Animator>();
         }
+        
+        if (groundLayer == 0)
+        {
+            groundLayer = LayerMask.GetMask("Ground");
+        }
     }
     
     public void StartPhase1()
@@ -70,33 +95,129 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
         StartCoroutine(AttackPattern());
     }
     
+    public void Stun(float duration)
+    {
+        StartCoroutine(StunSequence(duration));
+    }
+    
+    IEnumerator StunSequence(float duration)
+    {
+        isStunned = true;
+        if (animator != null) animator.SetBool("IsWalking", false);
+        yield return new WaitForSeconds(duration);
+        isStunned = false;
+    }
+    
     IEnumerator AttackPattern()
     {
         while (true)
         {
-            if (animator != null) animator.SetBool("IsWalking", false);
-            yield return new WaitForSeconds(timeBetweenAttacks);
-            
-            // Check for teleport before attacking
-            if (enableTeleport)
+            if (!isStunned)
             {
-                CheckAndTeleport();
+                if (animator != null) animator.SetBool("IsWalking", false);
+                yield return new WaitForSeconds(timeBetweenAttacks);
+                
+                if (isStunned) continue;
+                
+                // Check for melee range FIRST
+                float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+                if (distanceToPlayer <= meleeRange)
+                {
+                    yield return StartCoroutine(PerformMeleeAttack());
+                }
+                else
+                {
+                    // Check if we should move (walk or teleport)
+                    if (enableGradualMovement && Random.value < walkChance)
+                    {
+                        yield return StartCoroutine(WalkTowardsPlayer());
+                    }
+                    else if (enableTeleport)
+                    {
+                        CheckAndTeleport();
+                    }
+                    
+                    // Perform ranged attack pattern
+                    switch (currentPatternIndex)
+                    {
+                        case 0: yield return StartCoroutine(PerformCircularBurst()); break;
+                        case 1: yield return StartCoroutine(PerformAimedShot()); break;
+                        case 2: yield return StartCoroutine(PerformSpiral()); break;
+                        case 3: yield return StartCoroutine(PerformLightBeams()); break;
+                    }
+                    
+                    currentPatternIndex = (currentPatternIndex + 1) % 4;
+                }
             }
-            
-            switch (currentPatternIndex)
+            else
             {
-                case 0: yield return StartCoroutine(PerformCircularBurst()); break;
-                case 1: yield return StartCoroutine(PerformAimedShot()); break;
-                case 2: yield return StartCoroutine(PerformSpiral()); break;
-                case 3: yield return StartCoroutine(PerformLightBeams()); break;
+                yield return new WaitForSeconds(0.1f);
             }
-            
-            currentPatternIndex = (currentPatternIndex + 1) % 4;
         }
+    }
+    
+    IEnumerator PerformMeleeAttack()
+    {
+        Debug.Log("[Phase1] Performing melee attack!");
+        if (animator != null) animator.SetTrigger("Attack");
+        yield return new WaitForSeconds(0.3f);
+        
+        // Check if player is still in range
+        if (player != null)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+            if (distance <= meleeRange)
+            {
+                PlayerHealth playerHealth = player.GetComponent<PlayerHealth>();
+                if (playerHealth != null)
+                {
+                    playerHealth.TakeDamage(meleeDamage);
+                    
+                    // Apply knockback
+                    Rigidbody2D playerRb = player.GetComponent<Rigidbody2D>();
+                    if (playerRb != null)
+                    {
+                        Vector2 knockbackDir = (player.position - transform.position).normalized;
+                        playerRb.linearVelocity = knockbackDir * meleeKnockback;
+                    }
+                }
+            }
+        }
+    }
+    
+    IEnumerator WalkTowardsPlayer()
+    {
+        if (player == null) yield break;
+        
+        Debug.Log("[Phase1] Walking towards player!");
+        if (animator != null) animator.SetBool("IsWalking", true);
+        
+        float elapsed = 0f;
+        while (elapsed < walkDuration && !isStunned)
+        {
+            Vector2 direction = (player.position - transform.position).normalized;
+            
+            if (rb != null)
+            {
+                rb.linearVelocity = new Vector2(direction.x * walkSpeed, rb.linearVelocity.y);
+            }
+            else
+            {
+                transform.position += (Vector3)(direction * walkSpeed * Time.deltaTime);
+            }
+            
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+        if (animator != null) animator.SetBool("IsWalking", false);
     }
     
     IEnumerator PerformCircularBurst()
     {
+        if (isStunned) yield break;
+        
         if (animator != null) animator.SetTrigger("Attack");
         yield return new WaitForSeconds(0.2f);
         
@@ -109,7 +230,8 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     
     IEnumerator PerformAimedShot()
     {
-        if (player == null) yield break;
+        if (isStunned || player == null) yield break;
+        
         if (animator != null) animator.SetTrigger("Attack");
         yield return new WaitForSeconds(0.2f);
         
@@ -125,12 +247,14 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     
     IEnumerator PerformSpiral()
     {
+        if (isStunned) yield break;
+        
         if (animator != null) animator.SetTrigger("Attack");
         
         float elapsed = 0f;
         float currentAngle = 0f;
         
-        while (elapsed < spiralDuration)
+        while (elapsed < spiralDuration && !isStunned)
         {
             SpawnOrb(currentAngle);
             currentAngle += spiralRotationSpeed * spiralOrbInterval;
@@ -141,6 +265,8 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     
     IEnumerator PerformLightBeams()
     {
+        if (isStunned) yield break;
+        
         if (animator != null) animator.SetTrigger("Attack");
         yield return new WaitForSeconds(0.2f);
         
@@ -152,7 +278,6 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
                 float xPos = startX + (i * beamSpacing);
                 GameObject beam = Instantiate(lightBeamPrefab, new Vector3(xPos, attackPoint.position.y, 0), Quaternion.identity);
                 
-                // Initialize beam with timing
                 LightBeam beamScript = beam.GetComponent<LightBeam>();
                 if (beamScript != null)
                 {
@@ -166,12 +291,20 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     {
         if (orbPrefab == null || attackPoint == null) return;
         
-        GameObject orb = Instantiate(orbPrefab, attackPoint.position, Quaternion.identity);
+        // Spawn slightly away from boss to prevent collision issues
+        float spawnOffset = 0.5f;
         float angleRad = angleDegrees * Mathf.Deg2Rad;
         Vector2 direction = new Vector2(Mathf.Cos(angleRad), Mathf.Sin(angleRad));
+        Vector3 spawnPos = attackPoint.position + (Vector3)(direction * spawnOffset);
+        
+        GameObject orb = Instantiate(orbPrefab, spawnPos, Quaternion.identity);
         
         Rigidbody2D rb = orb.GetComponent<Rigidbody2D>();
-        if (rb != null) rb.linearVelocity = direction * orbSpeed;
+        if (rb != null)
+        {
+            rb.linearVelocity = direction * orbSpeed;
+            Debug.Log($"[Phase1] Spawned orb at {spawnPos} with velocity {direction * orbSpeed}");
+        }
     }
     
     void CheckAndTeleport()
@@ -181,19 +314,16 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
         
         float distanceToPlayer = Vector2.Distance(transform.position, player.position);
         
-        // Too close
         if (distanceToPlayer < minDistanceFromPlayer)
         {
             Debug.Log("[Phase1] Too close, teleporting away!");
             StartCoroutine(TeleportSequence());
         }
-        // Too far
         else if (distanceToPlayer > maxDistanceFromPlayer)
         {
             Debug.Log("[Phase1] Too far, teleporting closer!");
             StartCoroutine(TeleportSequence());
         }
-        // Near screen edge
         else if (IsNearScreenEdge())
         {
             Debug.Log("[Phase1] Near edge, teleporting!");
@@ -242,7 +372,7 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
         Camera cam = Camera.main;
         if (cam == null || player == null) return transform.position;
         
-        for (int attempt = 0; attempt < 10; attempt++)
+        for (int attempt = 0; attempt < 20; attempt++)
         {
             Vector3 randomOffset = new Vector3(
                 Random.Range(-10f, 10f),
@@ -253,18 +383,37 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
             Vector3 candidatePos = player.position + randomOffset;
             float distance = Vector2.Distance(candidatePos, player.position);
             
+            // Check distance requirements
             if (distance >= minDistanceFromPlayer && distance <= maxDistanceFromPlayer)
             {
+                // Check viewport bounds
                 Vector3 viewportPos = cam.WorldToViewportPoint(candidatePos);
-                
                 if (viewportPos.x > 0.2f && viewportPos.x < 0.8f &&
                     viewportPos.y > 0.2f && viewportPos.y < 0.8f)
                 {
-                    return candidatePos;
+                    // GROUND CHECK - Make sure we're not in the ground
+                    RaycastHit2D groundHit = Physics2D.Raycast(candidatePos, Vector2.down, groundCheckDistance, groundLayer);
+                    
+                    if (groundHit.collider != null)
+                    {
+                        // Adjust to be above ground
+                        float groundY = groundHit.point.y + minHeightAboveGround;
+                        candidatePos.y = groundY;
+                        
+                        // Verify final position is still in viewport
+                        viewportPos = cam.WorldToViewportPoint(candidatePos);
+                        if (viewportPos.x > 0.2f && viewportPos.x < 0.8f &&
+                            viewportPos.y > 0.2f && viewportPos.y < 0.8f)
+                        {
+                            Debug.Log($"[Phase1] Valid teleport position found at {candidatePos}");
+                            return candidatePos;
+                        }
+                    }
                 }
             }
         }
         
+        Debug.LogWarning("[Phase1] Could not find valid teleport position, staying in place");
         return transform.position;
     }
     
@@ -272,5 +421,19 @@ public class BulletHellBoss_Phase1 : MonoBehaviour
     {
         StopAllCoroutines();
         if (animator != null) animator.SetBool("IsWalking", false);
+        if (rb != null) rb.linearVelocity = Vector2.zero;
+    }
+    
+    void OnDrawGizmosSelected()
+    {
+        // Draw melee range
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, meleeRange);
+        
+        // Draw teleport ranges
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, minDistanceFromPlayer);
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, maxDistanceFromPlayer);
     }
 }
