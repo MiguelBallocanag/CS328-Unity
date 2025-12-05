@@ -473,7 +473,7 @@ Transform:
   m_GameObject: {fileID: 186192810}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1, y: -1.2, z: 0}
+  m_LocalPosition: {x: -0.3, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3892,7 +3892,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 100
+  m_Mass: 50
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_GravityScale: 1
@@ -3906,7 +3906,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 1
-  m_Constraints: 4
+  m_Constraints: 6
 --- !u!4 &678611034
 Transform:
   m_ObjectHideFlags: 0
@@ -3940,11 +3940,11 @@ MonoBehaviour:
   currentHealth: 0
   phase2HealthThreshold: 300
   healthBar: {fileID: 0}
-  animator: {fileID: 0}
-  spriteRenderer: {fileID: 0}
+  animator: {fileID: 739768110}
+  spriteRenderer: {fileID: 739768111}
   flashColor: {r: 1, g: 0, b: 0, a: 1}
-  flashDuration: 0.1
-  stunDuration: 0.3
+  flashDuration: 1
+  stunDuration: 0.5
   isInvulnerable: 0
   invulnerabilityDuration: 2
 --- !u!114 &678611036
@@ -3989,36 +3989,29 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
+  roomMin: {x: -18, y: 4}
+  roomMax: {x: 20, y: 3.5}
   orbPrefab: {fileID: 3348341767913489658, guid: 074c66b42049d514997426735912901e, type: 3}
-  orbSpeed: 5
+  orbSpeed: 20
+  orbSpawnOffset: 2.5
   lightBeamPrefab: {fileID: 7836029868585731759, guid: 2490528ad84c3f14a98c9db085de1109, type: 3}
-  beamWarningTime: 1
-  beamDamageTime: 2
-  meleeRange: 3
-  meleeDamage: 20
-  meleeKnockback: 8
-  timeBetweenAttacks: 2
-  burstOrbCount: 8
-  aimedShotCount: 3
-  aimedShotSpread: 15
-  spiralDuration: 3
-  spiralOrbInterval: 0.1
-  spiralRotationSpeed: 60
+  beamWarningTime: 2
+  beamDamageTime: 1.45
   beamCount: 3
   beamSpacing: 3
+  meleeRange: 1
+  meleeDamage: 20
+  meleeKnockback: 8
+  timeBetweenAttacks: 0.5
+  burstOrbCount: 8
+  aimedShotCount: 10
+  spiralDuration: 1
+  spiralOrbInterval: 1
+  spiralRotationSpeed: 60
   enableTeleport: 1
-  enableGradualMovement: 1
-  walkSpeed: 2
-  walkChance: 0.4
-  walkDuration: 1.5
-  minDistanceFromPlayer: 8
-  maxDistanceFromPlayer: 15
-  teleportCooldown: 5
-  edgeBuffer: 3
-  teleportEffectPrefab: {fileID: 0}
+  teleportCooldown: 5.07
   teleportFlashDuration: 0.3
-  groundCheckDistance: 2
-  minHeightAboveGround: 1
+  teleportEffectPrefab: {fileID: 0}
 --- !u!114 &678611038
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4152,7 +4145,7 @@ Transform:
   m_GameObject: {fileID: 739768108}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.94, y: -3.97, z: 0}
+  m_LocalPosition: {x: 1.69, y: -3.94, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5155,7 +5148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BulletHellBossTrigger
   boss: {fileID: 678611038}
-  activationDelay: 2
+  activationDelay: 1
 --- !u!61 &1458446721
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -5211,7 +5204,7 @@ Transform:
   m_GameObject: {fileID: 1458446719}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -15, y: 3.4876, z: 0}
+  m_LocalPosition: {x: -20, y: 3.4876, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -8331,10 +8324,10 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -47.9, y: -6.52}
-      - {x: -47.9, y: 16}
-      - {x: -3.6, y: 16}
-      - {x: -3.6, y: -6.5250044}
+    - - {x: -47.7766, y: -2.1619444}
+      - {x: -47.555443, y: 15.419138}
+      - {x: -3.2163591, y: 15.40727}
+      - {x: -3.2078333, y: -1.9500644}
   m_UseDelaunayMesh: 0
 --- !u!50 &6194838324608464311
 Rigidbody2D:
@@ -8680,7 +8673,7 @@ Transform:
   m_GameObject: {fileID: 7022970792689147222}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.078758, y: 2.3799996, z: -10}
+  m_LocalPosition: {x: -20.904198, y: 2.3799996, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -9175,7 +9168,7 @@ Transform:
   m_GameObject: {fileID: 913948940567242033}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -22.078758, y: 2.3799996, z: -10}
+  m_LocalPosition: {x: -20.20917, y: 2.3761196, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

@@ -5,72 +5,73 @@ public class EnemyProjectile : MonoBehaviour
     [Header("Settings")]
     public int damage = 10;
     public float lifetime = 10f;
-    
-    [Header("Visual")]
-    public TrailRenderer trail; // Optional
-    
+
     private Rigidbody2D rb;
+    private Vector2 direction;
     private bool hasHit = false;
-    
-    void Start()
+
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        
-        // Auto-destroy after lifetime
-        Destroy(gameObject, lifetime);
-    }
-    
-    public void Initialize(Vector2 direction, float speed)
-    {
-        if (rb == null) rb = GetComponent<Rigidbody2D>();
-        
         if (rb != null)
         {
-            rb.linearVelocity = direction.normalized * speed;
+            rb.bodyType = RigidbodyType2D.Dynamic;
+            rb.gravityScale = 0f;
+            rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+            rb.freezeRotation = true;
         }
-        
-        // Rotate sprite to face direction
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0, 0, angle);
     }
-    
-    void OnTriggerEnter2D(Collider2D other)
+
+    // Called by boss script
+    public void Initialize(Vector2 dir, float speed)
+    {
+        direction = dir.normalized;
+
+        if (rb != null)
+        {
+            rb.linearVelocity = direction * speed;
+        }
+    }
+
+    void FixedUpdate()
+    {
+        if (rb != null && !hasHit)
+        {
+            rb.linearVelocity = direction * rb.linearVelocity.magnitude;
+        }
+    }
+
+    void Update()
+    {
+        lifetime -= Time.deltaTime;
+        if (lifetime <= 0f)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
     {
         if (hasHit) return;
-        
-        // Check if hit player using tag
-        if (other.CompareTag("Player"))
+
+        Debug.Log($"[EnemyProjectile] Trigger with {other.name}, tag={other.tag}, layer={other.gameObject.layer}");
+
+        // Try to find PlayerHealth anywhere up the hierarchy
+        PlayerHealth playerHealth = other.GetComponentInParent<PlayerHealth>();
+        if (playerHealth != null)
         {
-            Debug.Log($"[EnemyProjectile] Hit player!");
-            
-            // Deal damage using PlayerHealth system
-            PlayerHealth playerHealth = other.GetComponent<PlayerHealth>();
-            if (playerHealth != null)
-            {
-                playerHealth.TakeDamage(damage);
-            }
-            
+            Debug.Log($"[EnemyProjectile] Dealing {damage} damage to player");
+            playerHealth.TakeDamage(damage);
             hasHit = true;
-            DestroyProjectile();
+            Destroy(gameObject);
+            return;
         }
-        
-        // Check if hit wall/ground using layer name
+
+        // If it hits ground, walls, etc, destroy it too
         if (other.gameObject.layer == LayerMask.NameToLayer("Ground"))
         {
-            Debug.Log($"[EnemyProjectile] Hit wall");
             hasHit = true;
-            DestroyProjectile();
+            Destroy(gameObject);
         }
-    }
-    
-    void DestroyProjectile()
-    {
-        // Optional: Spawn impact effect
-        // Instantiate(impactEffect, transform.position, Quaternion.identity);
-        
-        // Optional: Play sound
-        // AudioManager.Instance?.PlayProjectileHit();
-        
-        Destroy(gameObject);
     }
 }
