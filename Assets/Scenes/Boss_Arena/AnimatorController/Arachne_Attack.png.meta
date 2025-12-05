@@ -5,7 +5,7 @@ AssetOrigin:
   productId: 173738
   packageName: Monster Pack
   packageVersion: 1.0
-  assetPath: Assets/Monster Pack/Sprites/Arachne/Arachne_Attack.png
+  assetPath: Assets/Scenes/Boss_Arena/AnimatorController/Arachne/Arachne_Attack.png
   uploadId: 376159
 TextureImporter:
   internalIDToNameTable:
@@ -150,12 +150,12 @@ TextureImporter:
       name: Arachne_Attack_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 29
         y: 0
-        width: 80
-        height: 48
+        width: 29
+        height: 38
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -172,12 +172,12 @@ TextureImporter:
       name: Arachne_Attack_1
       rect:
         serializedVersion: 2
-        x: 80
+        x: 107
         y: 0
-        width: 80
-        height: 48
+        width: 30
+        height: 36
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -194,12 +194,12 @@ TextureImporter:
       name: Arachne_Attack_2
       rect:
         serializedVersion: 2
-        x: 160
+        x: 183
         y: 0
-        width: 80
-        height: 48
+        width: 34
+        height: 46
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -216,12 +216,12 @@ TextureImporter:
       name: Arachne_Attack_3
       rect:
         serializedVersion: 2
-        x: 240
+        x: 262
         y: 0
-        width: 80
-        height: 48
+        width: 34
+        height: 44
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -238,12 +238,12 @@ TextureImporter:
       name: Arachne_Attack_4
       rect:
         serializedVersion: 2
-        x: 320
+        x: 354
         y: 0
-        width: 80
-        height: 48
+        width: 42
+        height: 34
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -260,12 +260,12 @@ TextureImporter:
       name: Arachne_Attack_5
       rect:
         serializedVersion: 2
-        x: 400
+        x: 434
         y: 0
-        width: 80
-        height: 48
+        width: 32
+        height: 35
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -290,7 +290,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Arachne_Attack_0: -2818068662839385334
       Arachne_Attack_1: -5671386521650096083

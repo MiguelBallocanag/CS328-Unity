@@ -5,7 +5,7 @@ AssetOrigin:
   productId: 173738
   packageName: Monster Pack
   packageVersion: 1.0
-  assetPath: Assets/Monster Pack/Sprites/Arachne/Arachne_Idle.png
+  assetPath: Assets/Scenes/Boss_Arena/AnimatorController/Arachne_Idle.png
   uploadId: 376159
 TextureImporter:
   internalIDToNameTable:
@@ -132,12 +132,12 @@ TextureImporter:
       name: Arachne_Idle_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 22
         y: 0
-        width: 80
-        height: 48
+        width: 34
+        height: 40
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -154,12 +154,12 @@ TextureImporter:
       name: Arachne_Idle_1
       rect:
         serializedVersion: 2
-        x: 80
+        x: 101
         y: 0
-        width: 80
-        height: 48
+        width: 36
+        height: 39
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -176,12 +176,12 @@ TextureImporter:
       name: Arachne_Idle_2
       rect:
         serializedVersion: 2
-        x: 160
+        x: 184
         y: 0
-        width: 80
-        height: 48
+        width: 28
+        height: 39
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -198,12 +198,12 @@ TextureImporter:
       name: Arachne_Idle_3
       rect:
         serializedVersion: 2
-        x: 240
+        x: 260
         y: 0
-        width: 80
-        height: 48
+        width: 39
+        height: 40
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
@@ -228,7 +228,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries: []
+      entries:
+      - key: SpriteEditor.SliceSettings
+        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
       Arachne_Idle_0: -3245163076503582246
       Arachne_Idle_1: 3445137210905429827
