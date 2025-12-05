@@ -36,15 +36,25 @@ public class BulletHellBoss : MonoBehaviour
         
         if (phase1Sprite != null) phase1Sprite.SetActive(true);
         if (phase2Sprite != null) phase2Sprite.SetActive(false);
+        
+        // Disable both phases on start - trigger will activate Phase1
+        if (phase1Controller != null) phase1Controller.enabled = false;
         if (phase2Controller != null) phase2Controller.enabled = false;
     }
     
     public void ActivateBoss()
     {
+        Debug.Log("[BulletHellBoss] ActivateBoss() called!");
+        
         if (phase1Controller != null)
         {
             phase1Controller.enabled = true;
             phase1Controller.StartPhase1();
+            Debug.Log("[BulletHellBoss] Phase1 enabled and started!");
+        }
+        else
+        {
+            Debug.LogError("[BulletHellBoss] Phase1 controller is NULL!");
         }
     }
     

@@ -1,32 +1,37 @@
 fileFormatVersion: 2
-guid: dd7087fc71d01ad4494a0a0e06cd4274
-AssetOrigin:
-  serializedVersion: 1
-  productId: 173738
-  packageName: Monster Pack
-  packageVersion: 1.0
-  assetPath: Assets/Scenes/Boss_Arena/AnimatorController/Arachne_Walk.png
-  uploadId: 376159
+guid: fb2ad419ffc3edf41b33b02b313fda27
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3577797445096015503
-    second: Arachne_Walk_0
+      213: -2818068662839385334
+    second: Arachne_Attack_0
   - first:
-      213: 4549705457055002782
-    second: Arachne_Walk_1
+      213: -5671386521650096083
+    second: Arachne_Attack_1
   - first:
-      213: 6737732730182176167
-    second: Arachne_Walk_2
+      213: -2623805211000694153
+    second: Arachne_Attack_2
   - first:
-      213: 2123010571809760379
-    second: Arachne_Walk_3
+      213: 4425712480430911339
+    second: Arachne_Attack_3
   - first:
-      213: 2207944395173160942
-    second: Arachne_Walk_4
+      213: -1372358143199819921
+    second: Arachne_Attack_4
   - first:
-      213: 7516968304948859182
-    second: Arachne_Walk_5
+      213: 1296931599454094794
+    second: Arachne_Attack_5
+  - first:
+      213: 6629159812650006057
+    second: Arachne_Attack_6
+  - first:
+      213: 102470310916858076
+    second: Arachne_Attack_7
+  - first:
+      213: 6453797709180534909
+    second: Arachne_Attack_8
+  - first:
+      213: 4833467289217235870
+    second: Arachne_Attack_9
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -135,57 +140,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Arachne_Walk_0
+      name: Arachne_Attack_0
       rect:
         serializedVersion: 2
-        x: 23
-        y: 0
-        width: 30
-        height: 40
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: f868f3102d3e6a130800000000000000
-      internalID: 3577797445096015503
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Arachne_Walk_1
-      rect:
-        serializedVersion: 2
-        x: 102
-        y: 0
-        width: 30
-        height: 39
-      alignment: 0
-      pivot: {x: 0.5, y: 0.5}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: 0
-      bones: []
-      spriteID: e907b60020dc32f30800000000000000
-      internalID: 4549705457055002782
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: Arachne_Walk_2
-      rect:
-        serializedVersion: 2
-        x: 184
+        x: 29
         y: 0
         width: 29
-        height: 40
+        height: 38
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -194,20 +155,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7ad0806583c318d50800000000000000
-      internalID: 6737732730182176167
+      spriteID: a036cce5b7534e8d0800000000000000
+      internalID: -2818068662839385334
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Arachne_Walk_3
+      name: Arachne_Attack_1
       rect:
         serializedVersion: 2
-        x: 259
+        x: 107
         y: 0
-        width: 33
-        height: 40
+        width: 30
+        height: 36
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -216,20 +177,20 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b74ae1bedd2767d10800000000000000
-      internalID: 2123010571809760379
+      spriteID: d289b11c1003b41b0800000000000000
+      internalID: -5671386521650096083
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Arachne_Walk_4
+      name: Arachne_Attack_2
       rect:
         serializedVersion: 2
-        x: 343
+        x: 183
         y: 0
-        width: 31
-        height: 39
+        width: 34
+        height: 46
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -238,20 +199,64 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: ee76c1eaab134ae10800000000000000
-      internalID: 2207944395173160942
+      spriteID: 77a1c76ef0f569bd0800000000000000
+      internalID: -2623805211000694153
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Arachne_Walk_5
+      name: Arachne_Attack_3
       rect:
         serializedVersion: 2
-        x: 421
+        x: 262
+        y: 0
+        width: 34
+        height: 44
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6fe8127d0a4b6d30800000000000000
+      internalID: 4425712480430911339
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arachne_Attack_4
+      rect:
+        serializedVersion: 2
+        x: 354
+        y: 0
+        width: 42
+        height: 34
+      alignment: 0
+      pivot: {x: 0.5, y: 0.5}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f67c5f13a8764fce0800000000000000
+      internalID: -1372358143199819921
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Arachne_Attack_5
+      rect:
+        serializedVersion: 2
+        x: 434
         y: 0
         width: 32
-        height: 40
+        height: 35
       alignment: 0
       pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -260,8 +265,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e21d854c8d2a15860800000000000000
-      internalID: 7516968304948859182
+      spriteID: ac5c0731b60aff110800000000000000
+      internalID: 1296931599454094794
       vertices: []
       indices: 
       edges: []
@@ -282,12 +287,12 @@ TextureImporter:
       - key: SpriteEditor.SliceSettings
         value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":64.0,"y":64.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":0,"keepEmptyRects":false,"isAlternate":false}'
     nameFileIdTable:
-      Arachne_Walk_0: 3577797445096015503
-      Arachne_Walk_1: 4549705457055002782
-      Arachne_Walk_2: 6737732730182176167
-      Arachne_Walk_3: 2123010571809760379
-      Arachne_Walk_4: 2207944395173160942
-      Arachne_Walk_5: 7516968304948859182
+      Arachne_Attack_0: -2818068662839385334
+      Arachne_Attack_1: -5671386521650096083
+      Arachne_Attack_2: -2623805211000694153
+      Arachne_Attack_3: 4425712480430911339
+      Arachne_Attack_4: -1372358143199819921
+      Arachne_Attack_5: 1296931599454094794
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
