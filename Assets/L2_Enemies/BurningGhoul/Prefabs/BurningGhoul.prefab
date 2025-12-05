@@ -221,7 +221,7 @@ MonoBehaviour:
   detectionRange: 6
   explodeRange: 0.6
   moveSpeed: 3
-  explosionDamage: 999
+  explosionDamage: 50
   playerLayer:
     serializedVersion: 2
     m_Bits: 64

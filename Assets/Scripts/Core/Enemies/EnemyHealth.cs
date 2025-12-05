@@ -118,7 +118,8 @@ public class EnemyHealth : MonoBehaviour, IDamageable
         foreach (Collider2D col in GetComponentsInChildren<Collider2D>())
             col.enabled = false;
 
-        // FULL ROOT DELETE
-        Destroy(transform.root.gameObject);
+        // DESTROY ONLY THIS ENEMY
+        Destroy(gameObject, 0.1f);
     }
+
 }

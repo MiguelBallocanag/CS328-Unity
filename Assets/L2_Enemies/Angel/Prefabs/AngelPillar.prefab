@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d31463f203baace4bbcbaf73694e7c3b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  damage: 50
+  damage: 20
   warningTime: 1
   lifeTime: 0.2
   warningAlpha: 0.4
