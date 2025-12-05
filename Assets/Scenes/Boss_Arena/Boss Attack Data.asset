@@ -15,7 +15,7 @@ MonoBehaviour:
   startup: 0.06
   active: 0.08
   recovery: 0.12
-  damage: 10
+  damage: 25
   hitstun: 0.12
   knockback: {x: 2, y: 0}
   boxSize: {x: 1.1, y: 0.6}

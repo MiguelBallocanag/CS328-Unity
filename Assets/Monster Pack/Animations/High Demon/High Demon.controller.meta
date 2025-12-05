@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: e524cb2ed5713fb4abcf60ed5c92633b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173738
+  packageName: Monster Pack
+  packageVersion: 1.0
+  assetPath: Assets/Monster Pack/Animations/High Demon/High Demon.controller
+  uploadId: 376159

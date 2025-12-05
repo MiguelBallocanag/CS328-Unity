@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 257fb6d7fadce2443bde5af95b660566
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 173738
+  packageName: Monster Pack
+  packageVersion: 1.0
+  assetPath: Assets/Monster Pack/Animations/Demon/Demon.controller
+  uploadId: 376159
