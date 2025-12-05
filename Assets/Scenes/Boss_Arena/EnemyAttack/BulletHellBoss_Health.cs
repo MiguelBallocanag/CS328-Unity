@@ -1,12 +1,12 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 
-public class BulletHellBoss_Health : MonoBehaviour
+public class BulletHellBoss_Health : MonoBehaviour, IDamageable
 {
     [Header("Health Settings")]
     public int maxHealth = 200;
     public int currentHealth;
-    public int phase2HealthThreshold = 100;
     
     [Header("References")]
     public HealthBar healthBar;
@@ -24,16 +24,17 @@ public class BulletHellBoss_Health : MonoBehaviour
     
     [Header("Invulnerability")]
     public bool isInvulnerable = false;
-    public float invulnerabilityDuration = 2f;
     
-    private BulletHellBoss mainController;
+    [Header("Victory Settings")]
+    public string mainMenuScene = "GMainmenu";
+    public float victoryDelay = 3f;
+    
     private BulletHellBoss_Phase1 phase1Controller;
-    private bool hasTriggeredPhase2 = false;
+    private bool isDead = false;
     
     void Start()
     {
         currentHealth = maxHealth;
-        mainController = GetComponent<BulletHellBoss>();
         phase1Controller = GetComponent<BulletHellBoss_Phase1>();
         
         if (animator == null)
@@ -59,19 +60,22 @@ public class BulletHellBoss_Health : MonoBehaviour
         }
     }
     
+    public void TakeHit(DamageContext ctx)
+    {
+        TakeDamage(ctx.damage);
+    }
+    
     public void TakeDamage(int damageAmount)
     {
-        if (isInvulnerable) return;
+        if (isInvulnerable || isDead) return;
         
         currentHealth -= damageAmount;
         
-        // RED FLASH EFFECT
         if (spriteRenderer != null && !isFlashing)
         {
             StartCoroutine(FlashRed());
         }
         
-        // STUN EFFECT - Give player a chance to hit
         if (phase1Controller != null)
         {
             phase1Controller.Stun(stunDuration);
@@ -82,13 +86,7 @@ public class BulletHellBoss_Health : MonoBehaviour
         
         Debug.Log($"[BossHealth] Boss took {damageAmount} damage. Health: {currentHealth}/{maxHealth}");
         
-        if (!hasTriggeredPhase2 && currentHealth <= phase2HealthThreshold)
-        {
-            hasTriggeredPhase2 = true;
-            if (mainController != null) mainController.TriggerPhase2Transition();
-            StartCoroutine(TemporaryInvulnerability());
-        }
-        
+        // NO PHASE 2 - Just die when health reaches 0
         if (currentHealth <= 0) Die();
     }
     
@@ -103,29 +101,50 @@ public class BulletHellBoss_Health : MonoBehaviour
         isFlashing = false;
     }
     
-    IEnumerator TemporaryInvulnerability()
-    {
-        isInvulnerable = true;
-        yield return new WaitForSeconds(invulnerabilityDuration);
-        isInvulnerable = false;
-    }
-    
     void Die()
     {
+        if (isDead) return;
+        isDead = true;
+        
+        Debug.Log("[BossHealth] BOSS DEFEATED! YOU WIN!");
+        
         if (animator != null) animator.SetTrigger("Die");
         
+        // Stop attacks
         BulletHellBoss_Phase1 phase1 = GetComponent<BulletHellBoss_Phase1>();
         if (phase1 != null) phase1.StopAttacking();
         
-        BulletHellBoss_Phase2 phase2 = GetComponent<BulletHellBoss_Phase2>();
-        if (phase2 != null) phase2.StopAttacking();
+        // Destroy all projectiles
+        foreach (EnemyProjectile proj in FindObjectsByType<EnemyProjectile>(FindObjectsSortMode.None))
+        {
+            Destroy(proj.gameObject);
+        }
         
-        StartCoroutine(DeathSequence());
+        // Destroy all light beams
+        foreach (LightBeam beam in FindObjectsByType<LightBeam>(FindObjectsSortMode.None))
+        {
+            Destroy(beam.gameObject);
+        }
+        
+        StartCoroutine(VictorySequence());
     }
     
-    IEnumerator DeathSequence()
+    IEnumerator VictorySequence()
     {
-        yield return new WaitForSeconds(1.5f);
-        Destroy(gameObject);
+        EndScreenController endScreen = FindFirstObjectByType<EndScreenController>();
+        
+        if (endScreen != null)
+        {
+            if (endScreen.endText != null)
+            {
+                endScreen.endText.text = "VICTORY";
+            }
+            endScreen.gameObject.SetActive(true);
+            yield return StartCoroutine(endScreen.FadeToBlack());
+        }
+        
+        yield return new WaitForSeconds(victoryDelay);
+        
+        SceneManager.LoadScene(mainMenuScene);
     }
 }
