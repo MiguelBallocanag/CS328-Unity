@@ -1,5 +1,6 @@
-using Cinemachine;
+
 using UnityEngine;
+using Unity.Cinemachine;
 
 [RequireComponent(typeof(CinemachineVirtualCamera))]
 public class CameraDashBlend : MonoBehaviour
